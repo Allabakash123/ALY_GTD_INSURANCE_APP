@@ -1,6 +1,6 @@
-# My Django Project
+# Sample Project
 
-Welcome to **My Django Project**! This is a brief overview and setup guide for getting started with this Django web application.
+Welcome to **Sample Project**! This is a brief overview and setup guide for getting started with this Django web application.
 
 ## Table of Contents
 - [Introduction](#introduction)
