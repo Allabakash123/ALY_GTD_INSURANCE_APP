@@ -37,7 +37,7 @@ dump-djangodb-202401290024.sql
 python manage.py runserver
 ```
 
-# Optional
+# Other
 ### When creating new app you need to run these commands to do the necessary migrations
 ### Running makemigrations
 ```bash
