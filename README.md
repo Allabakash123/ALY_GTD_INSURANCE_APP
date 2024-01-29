@@ -38,7 +38,7 @@ python manage.py runserver
 ```
 
 # Optional
-## When creating new app you run these commands to do the necessary migration
+### When creating new app you need to run these commands to do the necessary migrations
 ### Running makemigrations
 ```bash
 python manage.py makemigrations <appname>
