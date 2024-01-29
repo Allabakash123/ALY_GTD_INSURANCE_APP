@@ -22,14 +22,7 @@ Sample base project for creating applications.
 ```bash
 pip install -r requirements.txt
 ```
-### Running makemigrations
-```bash
-python manage.py makemigrations
-```
-### Running migrate
-```bash
-python manage.py migrate
-```
+
 ### Run below database .sql dump from pgAdmin or Dbeaver
 ```bash
 dump-djangodb-202401290024.sql
@@ -42,4 +35,15 @@ dump-djangodb-202401290024.sql
 ### Run the Django project
 ```bash
 python manage.py runserver
+```
+
+# Optional
+## When creating new app you run these commands to do the necessary migration
+### Running makemigrations
+```bash
+python manage.py makemigrations <appname>
+```
+### Running migrate
+```bash
+python manage.py migrate <appname>
 ```
