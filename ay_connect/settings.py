@@ -17,34 +17,14 @@ APP_VERSION = "1.0.2"
 
 
 
+CURRENT_DB_ENGINE = ''
 
-from sqlalchemy import create_engine
-
-import pandas as pd
-
-
-LOCAL_DEV_XXERP = create_engine("""oracle+cx_oracle://xxerp:alyxxerp321@(DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 172.202.3.74)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = UAYSUF)
-    )
-  )""")
-LOCAL_DEV_XXERP_ORA = str(LOCAL_DEV_XXERP.url).split("oracle+cx_oracle://")[1].replace(':','/')
-CURRENT_DB_ENGINE=LOCAL_DEV_XXERP #TEST_APPS
-ENGINE = LOCAL_DEV_XXERP
-DEV_BOOLINF= LOCAL_DEV_XXERP
-
-# LOCAL_DEV_XXERP_ORA = ''
-# CURRENT_DB_ENGINE = ''
-# ENGINE = ''
-# DEV_BOOLINF = ''
 
 from pathlib import Path
 import os
 import environ
 import ldap
-from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
+from django_auth_ldap.config import LDAPSearch
 
 env = environ.Env()
 environ.Env.read_env()
