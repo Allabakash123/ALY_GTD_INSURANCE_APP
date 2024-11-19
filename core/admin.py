@@ -44,7 +44,7 @@ admin.site.register(APILog, APILogAdmin)
 
 
 class DataDictionarySectionAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('model_name', )
+    list_display = ('model_name',)
 
 class DataDictionaryAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('model_name', 'active','is_disabled','section','data_name', 'display_name', 'display_order_by', )

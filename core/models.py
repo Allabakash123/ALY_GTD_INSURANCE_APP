@@ -1,6 +1,7 @@
 import datetime
 from copy import deepcopy
 from datetime import timedelta
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 import pandas as pd
 from django.core.exceptions import ValidationError
@@ -115,7 +116,7 @@ class TopLayerBaseModel(models.Model):
         super(TopLayerBaseModel, self).save(*args, **kwargs)        
 
 class UserProfile(TopLayerBaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', primary_key=True,db_constraint=False)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile', primary_key=True,db_constraint=False)
     user_name = models.CharField(max_length=240, default='')
     employee_id = models.IntegerField(null=True, blank=True,unique=True)
     company = models.CharField(max_length=240, blank=True, null=True)
@@ -340,7 +341,7 @@ class LookupName(BaseMasterModel):
 class LookupNameValue(BaseMasterModel):
     lookup_value_id = models.BigAutoField(primary_key=True)
     code            = models.CharField(max_length=30)
-    lookup_type            = models.CharField(max_length=30)
+    lookup_type     = models.CharField(max_length=30)
     meaning         = models.CharField(max_length=240)
     description     = models.CharField(max_length=240, null=True)
     tag             = models.CharField(max_length=100, null=True)

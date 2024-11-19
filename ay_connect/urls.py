@@ -18,18 +18,24 @@ from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.http import HttpResponse
+
 import os
 import git
 
+from ALY_GTD.api import api
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+ 
     path('', include('core.urls',namespace='core')),
    
     path('accounts/', include('accounts.urls',namespace='accounts')),
 	
     path('setup/', include('setup.urls')),
-  
+    path('api/',api.urls),
     path('pricelist/', include('pricelist_update.urls')),
+    path('ALY_GTD/', include('ALY_GTD.urls')),
  
     re_path(r'^fp/', include('django_drf_filepond.urls')),
 ]

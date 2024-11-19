@@ -1,0 +1,129 @@
+<!-- templates/traffic_email_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Traffic File Approval Required</title>
+  </head>
+  <body style="font-family: Arial, sans-serif">
+    <p>Dear All,</p>
+    <p>{{ data.custom_message }}</p>
+
+
+    <table style="width: 50%; border-collapse: collapse; margin-bottom: 20px">
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Traffic File Number:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.TRAFFIC_FILE_NO|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Company Name:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.COMPANY_NAME|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Trade License No:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.TRADE_LICENSE_NO|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Emirates:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.EMIRATES|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Federal Traffic File No:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.FEDERAL_TRAFFIC_FILE_NO|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Salik Account No:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.SALIK_ACCOUNT_NO|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Status:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.STATUS }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Comments:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.COMMENTS }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Created By:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.CREATED_BY|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Creation Date:
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.CREATION_DATE|default:"N/A" }}
+        </td>
+      </tr>
+      
+    </table>
+
+
+    <!-- Add this section after the main table -->
+{% if comparison_data %}
+<h3>Changes Made:</h3>
+<table style="width: 50%; border-collapse: collapse; margin-bottom: 20px">
+  <tr>
+    <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">Column Name</th>
+    <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">Previous Value</th>
+    <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">Changed Value</th>
+  </tr>
+  {% for change in comparison_data %}
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px">{{ change.column }}</td>
+    <td style="border: 1px solid #000; padding: 8px">{{ change.previousValue }}</td>
+    <td style="border: 1px solid #000; padding: 8px">{{ change.newValue }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+
+    
+
+    <p>
+      <a href="{{ data.traffic_file_url }}" style="color: #0000EE; text-decoration: underline;">
+          Click here to view more details
+      </a>
+    </p>
+
+    <p>Thanks,<br />System Generated</p>
+  </body>
+</html>

@@ -32,44 +32,61 @@ def get_user_menu_roles(user_id):
         role_navigations[role_info.navigation_item.pk]= str(role_info.employee_role.pk)  if role_info.navigation_item.pk not in role_navigations else role_navigations[role_info.navigation_item.pk]+','+str(role_info.employee_role.pk)
     return role_navigations
 
+
 def get_all_menu(request):
-    all_menus = NavigationItem.active_objects.select_related("parent").all().values('color_class','icon_class','id','name','parent','parent__id','parent__name','url','filter_type', 'href', 'org_id_required').order_by('sort_by')
+    all_menus = NavigationItem.active_objects.select_related("parent").all().values(
+        'color_class', 'icon_class', 'id', 'name', 'parent', 'parent_id', 'url',
+        'filter_type', 'href', 'org_id_required', 'parent__name'
+    ).order_by('sort_by')
+
     main = []
-    children = {} 
+    children = {}
     user_menu_roles = get_user_menu_roles(request.user.id)
     cat = CrossAppAuth(request.user.username).get_hex_token()
+
+    is_requestor = request.session.get('is_requestor', False)
+    is_approver = request.session.get('is_approver', False)
+    is_both = request.session.get('is_both', False)
+
     for menu in all_menus:
-        menu_role = user_menu_roles[menu['id']] if  menu['id'] in user_menu_roles else None
-        if(menu['parent__id']==None):
-            href = (
-                menu["href"].replace("{{username}}", str(request.user.username.upper()))
-                if menu["href"]
-                else ""
-            )
-            href += f'''&cat={cat}''' if 'sw' in href else ''
-            main.append( {  'id' : menu['id'], 'name': menu['name'], 'url': menu['url'],  
-                            'color_class':menu['color_class'] or '',
-                            'icon_class':menu['icon_class'] or '',
-                            'filter_type':menu['filter_type'] or '',
-                            'emp_roles': menu_role,
-                            'org_id_required': menu['org_id_required'],
-                            'href': href or menu['url'],
-
-                          })
+        menu_name = menu['name']
+        parent_name = menu['parent__name']
+        
+        menu_role = user_menu_roles.get(menu['id'])
+        if menu['parent_id'] is None:
+            href = (menu["href"].replace("{{username}}", str(request.user.username.upper())) if menu["href"] else "")
+            href += f'&cat={cat}' if 'sw' in href else ''
+            main.append({
+                'id': menu['id'], 'name': menu['name'], 'url': menu['url'],
+                'color_class': menu['color_class'] or '',
+                'icon_class': menu['icon_class'] or '',
+                'filter_type': menu['filter_type'] or '',
+                'emp_roles': menu_role,
+                'org_id_required': menu['org_id_required'],
+                'href': href or menu['url'],
+            })
         else:
-            href = (
-                menu["href"].replace("{{username}}", str(request.user.username.upper()))
-                if menu["href"]
-                else ""
-            )
-            href += f'''&cat={cat}''' if 'sw' in href else ''
-
-            if menu['parent__id'] in children:
-                children[menu['parent__id']].append({ 'id' : menu['id'], 'name': menu['name'], 'url': menu['url'],'filter_type':menu['filter_type'] or '' , 'emp_roles': menu_role, 'href': href or menu['url'], 'org_id_required': menu['org_id_required'],})
+            href = (menu["href"].replace("{{username}}", str(request.user.username.upper())) if menu["href"] else "")
+            href += f'&cat={cat}' if 'sw' in href else ''
+            if menu['parent_id'] in children:
+                children[menu['parent_id']].append({
+                    'id': menu['id'], 'name': menu['name'], 'url': menu['url'],
+                    'filter_type': menu['filter_type'] or '',
+                    'emp_roles': menu_role, 'href': href or menu['url'],
+                    'org_id_required': menu['org_id_required'],
+                })
             else:
-                children[menu['parent__id']] = [{ 'id' : menu['id'], 'name': menu['name'], 'url': menu['url'],'filter_type':menu['filter_type'] or '' ,'emp_roles': menu_role, 'href': href or menu['url'], 'org_id_required': menu['org_id_required'],}]      
-    all_menus = {'main_menu': main, 'child_menu' : children}
+                children[menu['parent_id']] = [{
+                    'id': menu['id'], 'name': menu['name'], 'url': menu['url'],
+                    'filter_type': menu['filter_type'] or '',
+                    'emp_roles': menu_role, 'href': href or menu['url'],
+                    'org_id_required': menu['org_id_required'],
+                }]
+
+    all_menus = {'main_menu': main, 'child_menu': children}
     return all_menus
+
+
 
 
 @contextmanager

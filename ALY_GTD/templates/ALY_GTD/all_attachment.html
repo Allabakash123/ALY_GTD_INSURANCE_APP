@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Attachments</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+    
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            width: 200px;
+            max-height: 300px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            overflow-y: auto;
+        }
+    
+        .dropdown-menu.show {
+            display: block;
+        }
+    
+        .dropdown-item {
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+    
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown-box {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    
+        /* Table Styles */
+        .table {
+            border: 1px solid #dee2e6;
+            width: 100%;
+            color: #495057;
+            vertical-align: top;
+            border-color: #dee2e6;
+            margin-bottom: 20px;
+        }
+    
+        .table th {
+            background-color: #007bff;
+            color: white;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #dee2e6;
+        }
+    
+        .table td {
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            padding: 12px;
+        }
+    
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #e9ecef;
+        }
+    
+        /* Highlight row on hover */
+        .table tbody tr:hover {
+            background-color: #d1e7dd;
+        }
+    
+        /* Search Container */
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+    
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+    
+        #searchInput {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+    
+        .search-results-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            display: none;
+            z-index: 1000;
+        }
+    
+        .search-results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+        }
+    
+        .close-icon {
+            cursor: pointer;
+        }
+    
+        .search-results {
+            max-height: 200px;
+            overflow-y: auto;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .search-results li {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+    
+        .search-results li:hover {
+            background-color: #f0f0f0;
+        }
+    
+        /* Responsive Design */
+        @media (min-width: 1200px) {
+            .container, .container-lg, .container-md, .container-sm, .container-xl {
+                max-width: 100%;
+            }
+    
+            #searchInput {
+                width: 400px;
+                height: 50px;
+            }
+        }
+
+        #backButton {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        #backButton::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease-out, height 0.3s ease-out;
+        }
+
+        #backButton:active::before {
+            width: 140px;
+            height: 140px;
+        }
+
+        .view-button{
+            width:100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <!-- Header -->
+        <div class="header d-flex justify-content-start align-items-center mb-3">
+            <button id="backButton" class="btn btn-link" style='color: #ffffff; font-weight: bold;'>
+                <i class="fas fa-arrow-left"></i> 
+            </button>
+            <h4 class="mb-0 ms-3">All Attachments</h4>
+            <span id="fleetNumberHeader" class="ms-auto">AV-0000239-0000239</span>
+        </div>
+
+      
+
+        <!-- Show All Attachments Button (Visible Only When Filtering) -->
+        <button type="button" class="btn btn-secondary mb-3" id="showAllBtn" style="display: none;">
+            <i class="fa-solid fa-paperclip" style="margin-right: 8px"></i>
+            Back
+        </button>
+
+        <!-- Search Container -->
+        <div class="form-group search-container" id="searchContainer">
+            <div class="search-input-wrapper">
+                <input type="text" id="searchInput" placeholder="Search fleet numbers..." autocomplete="off">
+                <span class="search-icon"><i class="fas fa-search"></i></span>
+            </div>
+            <div class="search-results-container">
+                <div class="search-results-header">
+                    <span>Search Results</span>
+                    <span class="close-icon"><i class="fas fa-times"></i></span>
+                </div>
+                <ul class="search-results"></ul>
+            </div>
+        </div>
+
+        <!-- All Attachments Table -->
+        <div id="allAttachmentsContainer">
+            <table class="table table-striped">
+                <thead class="th">
+                    <tr>
+                        <th>
+                            Fleet Number
+                            <div class="dropdown-box">
+                                <i class="fas fa-caret-down dropdown-icon" data-column="fleet"></i>
+                            </div>
+                            <div class="dropdown-menu" id="fleetDropdown"></div>
+                        </th>
+                        <th>Doc. Type
+                            <div class="dropdown-box">
+                                <i class="fas fa-caret-down dropdown-icon" data-column="doctype"></i>
+                            </div>
+                            <div class="dropdown-menu" id="doctypeDropdown"></div>
+                        </th>
+                        <th>Files</th>
+                        <th>Uploaded By</th>
+                        <th>Uploaded Date
+                            <div class="dropdown-box">
+                                <i class="fas fa-caret-down dropdown-icon" data-column="date"></i>
+                            </div>
+                            <div class="dropdown-menu" id="dateDropdown"></div>
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="allAttachmentsTableBody">
+                    <!-- Data will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fleetNumber = urlParams.get('fleet_number');
+        
+            const searchContainer = document.getElementById('searchContainer');
+            const showAllBtn = document.getElementById('showAllBtn');
+            const fleetNumberHeader = document.getElementById('fleetNumberHeader');
+            const searchInput = document.getElementById('searchInput');
+            const searchResultsContainer = document.querySelector('.search-results-container');
+            const searchResults = document.querySelector('.search-results');
+            const closeIcon = document.querySelector('.close-icon');
+        
+            if (fleetNumber) {
+                searchContainer.style.display = 'none';
+                showAllBtn.style.display = 'none';
+                fleetNumberHeader.textContent = `Fleet Number: ${fleetNumber}`;
+                fetchAttachments(fleetNumber);
+            } else {
+                searchContainer.style.display = 'block';
+                showAllBtn.style.display = 'none';
+                fleetNumberHeader.textContent = 'All Attachments';
+                fetchAttachments();
+            }
+        
+            // Search functionality
+            if (!fleetNumber) {
+                searchInput.addEventListener('focus', fetchAndPopulateSearchResults);
+                searchInput.addEventListener('click', fetchAndPopulateSearchResults);
+                searchInput.addEventListener('input', function() {
+                    fetchAndPopulateSearchResults(new Event('click'));
+                });
+                closeIcon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    hideSearchResults();
+                });
+                document.addEventListener('click', function(event) {
+                    if (!event.target.closest('.search-container')) {
+                        hideSearchResults();
+                    }
+                });
+            }
+
+            $('.clear-filter').on('click', function(e) {
+                e.stopPropagation();
+                const column = $(this).data('column');
+                clearFilter(column);
+            });
+            
+            function clearFilter(column) {
+                $('table tbody tr').show();
+                $(`#${column}Dropdown`).removeClass('show');
+            }
+
+            function filterTable(column, value) {
+                if (value === 'All') {
+                    $('table tbody tr').show();
+                } else {
+                    $('table tbody tr').each(function() {
+                        const row = $(this);
+                        const cellValue = row.find(`td:nth-child(${getColumnIndex(column)})`).text();
+                        if (cellValue === value) {
+                            row.show();
+                        } else {
+                            row.hide();
+                        }
+                    });
+                }
+            }
+            
+            // Dropdown functionality
+            $('.dropdown-box').on('click', function(e) {
+                e.stopPropagation();
+                const column = $(this).find('.dropdown-icon').data('column');
+                const currentDropdown = $(`#${column}Dropdown`);
+                $('.dropdown-menu').not(currentDropdown).removeClass('show');
+                currentDropdown.toggleClass('show');
+            });
+        
+            $(document).on('click', function() {
+                $('.dropdown-menu').removeClass('show');
+            });
+        
+            $(document).on('click', '.dropdown-item', function() {
+                const value = $(this).text();
+                const column = $(this).closest('.dropdown-menu').attr('id').replace('Dropdown', '');
+                filterTable(column, value);
+                $(this).closest('.dropdown-menu').removeClass('show');
+            });
+            
+            function getColumnIndex(column) {
+                switch(column) {
+                    case 'fleet': return 1;
+                    case 'doctype': return 2;
+                    case 'date': return 5;
+                    default: return 1;
+                }
+            }
+        
+            function populateDropdowns(attachments) {
+                const fleetNumbers = [...new Set(attachments.map(a => a.FLEET_CONTROL_NO))];
+                const docTypes = [...new Set(attachments.map(a => a.attachment_type))];
+                const dates = [...new Set(attachments.map(a => a.upload_date))];
+
+                populateDropdown('#fleetDropdown', fleetNumbers);
+                populateDropdown('#doctypeDropdown', docTypes);
+                populateDropdown('#dateDropdown', dates);
+            }
+        
+            function populateDropdown(dropdownId, items) {
+                const dropdown = $(dropdownId);
+                dropdown.empty();
+                dropdown.append(`<div class="dropdown-item">All</div>`);
+                items.forEach(item => {
+                    dropdown.append(`<div class="dropdown-item">${item}</div>`);
+                });
+            }
+
+            // Fetch and populate search results
+            async function fetchAndPopulateSearchResults(event) {
+                if (fleetNumber) return;
+                event.stopPropagation();
+                try {
+                    const response = await fetch('/api/unique-fleet-numbers');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const fleetNumbers = await response.json();
+            
+                    searchResults.innerHTML = '';
+                    fleetNumbers.forEach((number) => {
+                        const li = document.createElement('li');
+                        li.textContent = number;
+                        li.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            searchInput.value = number;
+                            hideSearchResults();
+                            fetchAttachments(number);
+                            searchContainer.style.display = 'none';
+                            showAllBtn.style.display = 'block';
+                            fleetNumberHeader.textContent = `Fleet Number: ${number}`;
+                        });
+                        searchResults.appendChild(li);
+                    });
+                    showSearchResults();
+                } catch (error) {
+                    console.error('Error fetching fleet numbers:', error);
+                }
+            }
+            
+            function showSearchResults() {
+                searchResultsContainer.style.display = 'block';
+            }
+            
+            function hideSearchResults() {
+                searchResultsContainer.style.display = 'none';
+            }
+
+            // "Show All Attachments" button functionality
+            $('#showAllBtn').on('click', function() {
+                window.location.href = "{% url 'all_attachment' %}";
+            });
+
+            // Function to fetch and display attachments
+            function fetchAttachments(fleetNum) {
+                let url = '/api/attachments';
+                if (fleetNum) {
+                    url += `/${fleetNum}`;
+                }
+            
+                console.log("Fetching attachments from URL:", url);
+            
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(data) {
+                        console.log("Fetched data:", data);
+                        console.log("Number of attachments:", data.length);
+                        displayAllAttachments(data);
+                        populateDropdowns(data);
+                        updateFleetNumberDisplay(data);
+                    },
+                    error: function(error) {
+                        console.error('Error fetching attachments:', error);
+                        if (error.responseJSON && error.responseJSON.detail) {
+                            console.error('Error details:', error.responseJSON.detail);
+                        }
+                    }
+                });
+            }
+            
+            function displayAllAttachments(attachments) {
+                const tableBody = $('#allAttachmentsTableBody');
+                tableBody.empty();
+            
+                console.log("Displaying attachments. Count:", attachments.length);
+            
+                if (attachments.length === 0) {
+                    console.log("No attachments found");
+                    tableBody.append('<tr><td colspan="6">No attachments found</td></tr>');
+                    return;
+                }
+            
+                attachments.forEach((attachment, index) => {
+                    console.log(`Processing attachment ${index + 1}:`, attachment);
+                    const row = `
+                        <tr>
+                            <td>${attachment.FleetNumber || 'N/A'}</td>
+                            <td>${attachment.attachment_type || 'N/A'}</td>
+                            <td>${getFileName(attachment.file) || 'N/A'}</td>
+                            <td>${attachment.uploaded_by || 'N/A'}</td>
+                            <td>${attachment.upload_date || 'N/A'}</td>
+                            <td><button class="btn btn-sm btn-primary view-button" onclick="viewFile('${attachment.file}')">View</button></td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            
+                console.log("Finished displaying attachments");
+            }
+            function updateFleetNumberDisplay(attachments) {
+                const uniqueFleetNumbers = [...new Set(attachments.map(a => a.FLEET_CONTROL_NO))];
+                const fleetNumberContainer = $('#fleetNumberContainer');
+                fleetNumberContainer.empty();
+                
+                uniqueFleetNumbers.forEach(fleetNumber => {
+                    fleetNumberContainer.append(`<span class="badge bg-primary me-2 mb-2">${fleetNumber}</span>`);
+                });
+            }
+
+            document.getElementById('backButton').addEventListener('click', function(e) {
+                e.preventDefault();
+                this.classList.add('clicked');
+                
+                setTimeout(() => {
+                  var state = JSON.parse(sessionStorage.getItem('fleetMasterState'));
+                  var originPage = sessionStorage.getItem('originPage');
+                  
+                  var url = originPage === 'approver' ? "{% url 'approver_dashboard' %}" : "{% url 'fleet_master' %}";
+                  
+                  if (state && state.headerId) {
+                    sessionStorage.setItem('fleetMasterState', JSON.stringify({headerId: state.headerId}));
+                  }
+                  
+                  window.location.href = url;
+                }, 300);
+              });
+              
+               
+
+            
+            // Helper function to extract file name from file path
+            function getFileName(filePath) {
+                return filePath.split('/').pop();
+            }
+
+            // Function to open file in a new tab
+            window.viewFile = function(filePath) {
+                window.open('/media/' + filePath, '_blank');
+            }
+            
+            
+        });
+    </script>
+
+    <!-- Bootstrap Bundle JS (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

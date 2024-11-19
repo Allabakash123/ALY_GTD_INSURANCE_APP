@@ -758,7 +758,14 @@
     (function() {
     
         const idleDurationSecs = 3600;    // X number of seconds
-        const redirectUrl = '/logout';  // Redirect idle users to this URL
+        const redirectUrl = '/logout'; 
+        function clearLocalStorageExceptIsCheckedIn() {
+            const isCheckedIn = localStorage.getItem('isCheckedIn');
+            localStorage.clear(); // Clear all local storage
+            if (isCheckedIn !== null) {
+                localStorage.setItem('isCheckedIn', isCheckedIn); // Restore 'isCheckedIn'
+            }
+        } // Redirect idle users to this URL
         let idleTimeout; // variable to hold the timeout, do not modify
     
         const resetIdleTimeout = function() {

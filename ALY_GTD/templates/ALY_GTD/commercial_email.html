@@ -1,0 +1,283 @@
+<!-- templates/email_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   
+    <style>
+        /* Your existing styles */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+
+  </head>
+  <body style="font-family: Arial, sans-serif">
+    <p>Dear All,</p>
+   
+   
+
+    <table style="width: 50%; border-collapse: collapse; margin-bottom: 20px">
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          Commercial Control Number :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.COMM_CONTROL_NO|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          Date :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.COMM_PLATE_DATE|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          Commercial Plate Number :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.COMM_PLATE_NO|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          Category :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.COMM_PLATE_CATEGORY|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          Issued Authority :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.CP_ISSUED_AUTHORITY|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          Vehicle Type :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.CP_VEHICLE_TYPE|default:"N/A" }}
+        </td>
+      </tr>
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          Color :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.CP_COLOR|default:"N/A" }}
+        </td>
+      </tr>
+      
+      <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+          Status :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {% if data.STATUS %}
+            {{ data.STATUS }}
+          {% elif data.commercial_master.STATUS %}
+            {{ data.commercial_master.STATUS }}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+      
+
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          COMMENTS :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.COMMENTS|default:"N/A" }}
+        </td>
+      </tr>
+
+      <tr>
+        <th
+          style="
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+            background-color: #000080;
+            color: white;
+          "
+        >
+          ACTION :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+          {{ data.ACTION }}
+        </td>
+      </tr>
+     
+ 
+
+{% if is_new_submission %}
+    <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+            Created By :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+            {{ data.CREATED_BY}}
+        </td>
+    </tr>
+    <tr>
+        <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+            Creation Date :
+        </th>
+        <td style="border: 1px solid #000; padding: 8px">
+            {{ data.CREATION_DATE }}
+        </td>
+    </tr>
+{% else %}
+    {% if action == 'Modified' or action != 'Approved' %}
+        <tr>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+                Modified By :
+            </th>
+            <td style="border: 1px solid #000; padding: 8px">
+                {{ data.LAST_UPDATED_BY}}
+            </td>
+        </tr>
+        <tr>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+                Modified Date :
+            </th>
+            <td style="border: 1px solid #000; padding: 8px">
+                {{ data.LAST_UPDATE_DATE }}
+            </td>
+        </tr>
+    {% elif action == 'Approved' %}
+        <tr>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+                Approved By :
+            </th>
+            <td style="border: 1px solid #000; padding: 8px">
+                {{ data.LAST_UPDATED_BY }}
+            </td>
+        </tr>
+        <tr>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; background-color: #000080; color: white;">
+                Approved Date :
+            </th>
+            <td style="border: 1px solid #000; padding: 8px">
+                {{ data.LAST_UPDATE_DATE }}
+            </td>
+        </tr>
+    {% endif %}
+{% endif %}
+
+
+      
+      {% comment %} <h1>{% if is_new_submission %}New Fleet Master Submission{% else %}Fleet Master Update{% endif %}</h1> {% endcomment %}
+   
+    {% if not is_new_submission and comparison_data %}
+<h2>Modified Fields:</h2>
+<table class="comparison-table">
+    <tr>
+        <th>Column Name</th>
+        <th>Previous Value</th>
+        <th>Changed Value</th>
+    </tr>
+    {% for field in comparison_data %}
+    <tr>
+        <td>{{ field.column_name }}</td>
+        <td>{{ field.column_value1 }}</td>
+        <td>{{ field.column_value2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+
+      
+    </table>
+    <p>
+      <a href="{{ data.commercial_master_url }}" style="color: #0000EE; text-decoration: underline;">
+          Click here to view more details
+      </a>
+  </p>
+  
+  </body>
+</html>

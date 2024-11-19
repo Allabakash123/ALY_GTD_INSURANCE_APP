@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Action History</title>
+    <style>
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+        }
+        .back-buttons {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 32px;
+            padding: 0;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        .table-containers {
+            overflow: auto;
+            padding-top: 16px;
+        }
+        table {
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th {
+            background-color:  #007bff;
+            color: white;
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: normal;
+            font-size: 14px;
+            width: 100vw;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        .comments-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .comments-section h5 {
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+        .comments-content {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            border-radius: 3px;
+            min-height: 50px; /* Ensures the field has some height even when empty */
+        }
+
+        .table-active {
+    background-color: #e9ecef !important;
+}
+
+#actionHistoryBody tr:hover {
+    background-color: #f8f9fa;
+}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header d-flex justify-content-start align-items-center mb-3">
+        <button id="backButton" class="btn btn-link" style='color: #ffffff; font-weight: bold;'>
+            <i class="fas fa-arrow-left"></i> 
+        </button>
+        <h4 class="mb-0 ms-3">Action History</h4>
+    </div>
+    
+    <div class="table-containers">
+        <table>
+            <thead>
+                <tr>
+                    <th>Seq Id</th>
+                    <th>Request No.</th>
+                    <th>Request Type</th>
+                    <th>Process Status</th>
+                    <th>Doc Status</th>
+                    <th>Response Date</th>
+                    <th>Responded By</th>
+                    <th>Responded Role</th>
+                    <th>Action Performed</th>
+                    <th>Next Response</th>
+                </tr>
+            </thead>
+            <tbody id="actionHistoryBody">
+                <!-- Table rows will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h5>Response Comments</h5>
+        <div id="commentsContent" class="comments-content">
+            <!-- Comments will be populated dynamically -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    var fleetState = JSON.parse(sessionStorage.getItem('fleetMasterState') || '{}');
+    var commercialState = JSON.parse(sessionStorage.getItem('commercialMasterState') || '{}');
+    var controlNumber = fleetState.fleetNumber || commercialState.commercialNumber;
+
+    if (controlNumber) {
+        fetchActionHistory(controlNumber);
+    } else {
+        alert('No Control Number provided');
+    }
+});
+
+function fetchActionHistory(controlNumber) {
+    fetch(`/api/action-history/${controlNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            populateTable(data.results);
+            populateComments(data.results);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error fetching action history');
+        });
+}
+
+function populateTable(actionHistory) {
+    const tableBody = document.getElementById('actionHistoryBody');
+    tableBody.innerHTML = '';
+    
+    actionHistory.forEach((action, index) => {
+        const row = tableBody.insertRow();
+        row.style.cursor = 'pointer';
+        
+        row.addEventListener('click', () => {
+            document.querySelectorAll('#actionHistoryBody tr').forEach(r => {
+                r.classList.remove('table-active');
+            });
+            
+            row.classList.add('table-active');
+            
+            const commentsContent = document.getElementById('commentsContent');
+            if (!action.RESPONSE_COMMENTS || action.RESPONSE_COMMENTS.trim() === '') {
+                const message = `Request for ${action.REQUEST_NUMBER} is submitted by the User: ${action.RESPONDED_BY}`;
+                commentsContent.textContent = message;
+            } else {
+                commentsContent.textContent = action.RESPONSE_COMMENTS;
+            }
+        });
+
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${action.REQUEST_NUMBER || ''}</td>
+            <td>${action.REQUEST_TYPE || ''}</td>
+            <td>${action.PROCESS_STATUS || ''}</td>
+            <td>${action.DOC_STATUS || ''}</td>
+            <td>${action.RESPONSE_DATE || ''}</td>
+            <td>${action.RESPONDED_BY || ''}</td>
+            <td>${action.RESPONDER_ROLE || ''}</td>
+            <td>${action.ACTION_PERFORMED || ''}</td>
+            <td>${action.NEXT_RESP || ''}</td>
+        `;
+    });
+
+    if (actionHistory.length > 0) {
+        const firstRow = tableBody.querySelector('tr');
+        firstRow.classList.add('table-active');
+        const firstAction = actionHistory[0];
+        const commentsContent = document.getElementById('commentsContent');
+        
+        if (!firstAction.RESPONSE_COMMENTS || firstAction.RESPONSE_COMMENTS.trim() === '') {
+            const message = `Request for ${firstAction.REQUEST_NUMBER} is submitted by the User: ${firstAction.RESPONDED_BY}`;
+            commentsContent.textContent = message;
+        } else {
+            commentsContent.textContent = firstAction.RESPONSE_COMMENTS;
+        }
+    }
+}
+
+function populateComments(actionHistory) {
+    const commentsContent = document.getElementById('commentsContent');
+    if (actionHistory.length > 0) {
+        const firstAction = actionHistory[0];
+        if (!firstAction.RESPONSE_COMMENTS || firstAction.RESPONSE_COMMENTS.trim() === '') {
+            const message = `Request for ${firstAction.REQUEST_NUMBER} is submitted by the User: ${firstAction.RESPONDED_BY}`;
+            commentsContent.textContent = message;
+        } else {
+            commentsContent.textContent = firstAction.RESPONSE_COMMENTS;
+        }
+    } else {
+        commentsContent.textContent = 'No action history available.';
+    }
+}
+
+document.getElementById('backButton').addEventListener('click', function(e) {
+    e.preventDefault();
+    this.classList.add('clicked');
+
+    setTimeout(() => {
+        var fleetState = JSON.parse(sessionStorage.getItem('fleetMasterState') || '{}');
+        var commercialState = JSON.parse(sessionStorage.getItem('commercialMasterState') || '{}');
+        var originPage = sessionStorage.getItem('originPage');
+
+        sessionStorage.setItem('isReadOnly', 'true');
+        var url;
+        if (originPage === 'approver') {
+            url = "{% url 'approver_dashboard' %}";
+        } else if (fleetState.fleetNumber) {
+            url = "{% url 'fleet_master' %}";
+        } else if (commercialState.commercialNumber) {
+            url = "{% url 'commercial_master' %}";
+        }
+
+        if (fleetState.headerId) {
+            sessionStorage.setItem('fleetMasterState', JSON.stringify({headerId: fleetState.headerId}));
+        } else if (commercialState.headerId) {
+            sessionStorage.setItem('commercialMasterState', JSON.stringify({headerId: commercialState.headerId}));
+        }
+
+        sessionStorage.setItem('fromActionHistoryToApprover', 'true');
+        window.location.href = url;
+    }, 300);
+});
+
+
+        
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     var fleetState = JSON.parse(sessionStorage.getItem('fleetMasterState') || '{}');
+        //     var commercialState = JSON.parse(sessionStorage.getItem('commercialMasterState') || '{}');
+        //     var controlNumber = fleetState.fleetNumber || commercialState.commercialNumber;
+        
+        //     if (controlNumber) {
+        //         fetchActionHistory(controlNumber);
+        //     } else {
+        //         alert('No Control Number provided');
+        //     }
+        // });
+        
+        // function fetchActionHistory(controlNumber) {
+        //     fetch(`/api/action-history/${controlNumber}`)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             populateTable(data.results);
+        //             populateComments(data.results);
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             alert('Error fetching action history');
+        //         });
+        // }
+        
+        // function populateTable(actionHistory) {
+        //     const tableBody = document.getElementById('actionHistoryBody');
+        //     tableBody.innerHTML = '';
+        //     actionHistory.forEach((action, index) => {
+        //         const row = tableBody.insertRow();
+        //         row.innerHTML = `
+        //             <td>${index + 1}</td>
+        //             <td>${action.REQUEST_NUMBER || ''}</td>
+        //             <td>${action.REQUEST_TYPE || ''}</td>
+        //             <td>${action.PROCESS_STATUS || ''}</td>
+        //             <td>${action.DOC_STATUS || ''}</td>
+        //             <td>${action.RESPONSE_DATE || ''}</td>
+        //             <td>${action.RESPONDED_BY || ''}</td>
+        //             <td>${action.RESPONDER_ROLE || ''}</td>
+        //             <td>${action.ACTION_PERFORMED || ''}</td>
+        //             <td>${action.NEXT_RESP || ''}</td>
+        //         `;
+        //     });
+        // }
+        
+        // function populateComments(actionHistory) {
+        //     const commentsContent = document.getElementById('commentsContent');
+        //     if (actionHistory.length > 0) {
+        //         commentsContent.textContent = actionHistory[0].RESPONSE_COMMENTS || 'No comments available.';
+        //     } else {
+        //         commentsContent.textContent = 'No action history available.';
+        //     }
+        // }
+        
+        // document.getElementById('backButton').addEventListener('click', function(e) {
+        //     e.preventDefault();
+        //     this.classList.add('clicked');
+        
+        //     setTimeout(() => {
+        //         var fleetState = JSON.parse(sessionStorage.getItem('fleetMasterState') || '{}');
+        //         var commercialState = JSON.parse(sessionStorage.getItem('commercialMasterState') || '{}');
+        //         var originPage = sessionStorage.getItem('originPage');
+        
+        //         sessionStorage.setItem('isReadOnly', 'true');
+        //         var url;
+        //         if (originPage === 'approver') {
+        //             url = "{% url 'approver_dashboard' %}";
+        //         } else if (fleetState.fleetNumber) {
+        //             url = "{% url 'fleet_master' %}";
+        //         } else if (commercialState.commercialNumber) {
+        //             url = "{% url 'commercial_master' %}";
+        //         }
+        
+        //         if (fleetState.headerId) {
+        //             sessionStorage.setItem('fleetMasterState', JSON.stringify({headerId: fleetState.headerId}));
+        //         } else if (commercialState.headerId) {
+        //             sessionStorage.setItem('commercialMasterState', JSON.stringify({headerId: commercialState.headerId}));
+        //         }
+        
+        //         sessionStorage.setItem('fromActionHistoryToApprover', 'true');
+
+        
+        //         window.location.href = url;
+        //     }, 300);
+        // });
+        
+        
+    </script>
+
+
+</body>
+</html>
+

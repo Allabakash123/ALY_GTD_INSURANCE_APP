@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Action History</title>
+    <style>
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+        }
+        .back-buttons {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 32px;
+            padding: 0;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: normal;
+            margin: 0;
+        }
+        
+        .table-containers {
+            overflow: auto;
+            padding-top: 16px;
+        }
+        table {
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th {
+            background-color:  #007bff;
+            color: white;
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: normal;
+            font-size: 14px;
+            width: 100vw;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        .comments-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .comments-section h5 {
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+        .comments-content {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            border-radius: 3px;
+            min-height: 50px; /* Ensures the field has some height even when empty */
+        }
+        .filter-icon {
+        cursor: pointer;
+        margin-left: 5px;
+        color: #ffffff;
+    }
+
+    .filter-container {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .filter-option {
+        display: block;
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    .filter-option:hover {
+        background-color: #f0f0f0;
+    }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header d-flex justify-content-start align-items-center mb-3">
+        <button id="backButton" class="btn btn-link" style='color: #ffffff; font-weight: bold;'>
+            <i class="fas fa-arrow-left"></i> 
+        </button>
+        <h4 class="mb-0 ms-3">Action History</h4>
+    </div>
+    
+    <div class="table-containers">
+        <table>
+            <thead>
+                <tr>
+                    <th>Seq Id</th>
+                    <th>
+                        Request No.
+                        <i class="fas fa-filter filter-icon" data-column="REQUEST_NUMBER"></i>
+                    </th>
+                    <th>Request Type</th>
+                    <th>Process Status</th>
+                    <th>
+                        Doc Status
+                        <i class="fas fa-filter filter-icon" data-column="DOC_STATUS"></i>
+                    </th>
+                    <th>Response Date</th>
+                    <th>Responded By</th>
+                    <th>Responded Role</th>
+                    <th>Action Performed</th>
+                    <th>Next Response</th>
+                </tr>
+            </thead>
+            <tbody id="actionHistoryBody">
+                <!-- Table rows will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h5>Response Comments</h5>
+        <div id="commentsContent" class="comments-content">
+            <!-- Comments will be populated dynamically -->
+        </div>
+    </div>
+    <!-- ... existing HTML ... -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchActionHistory();
+    
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.history.back();
+        });
+    });
+
+    let actionHistoryData = [];
+    
+    async function fetchActionHistory() {
+        try {
+            const response = await fetch('/api/traffic-file-action-history');
+            const data = await response.json();
+
+            if (data.count > 0) {
+                actionHistoryData = data.results;
+                populateActionHistoryTable(actionHistoryData);
+            } else {
+                document.getElementById('actionHistoryBody').innerHTML = '<tr><td colspan="10">No action history available.</td></tr>';
+            }
+        } catch (error) {
+            console.error('Error fetching action history:', error);
+            document.getElementById('actionHistoryBody').innerHTML = '<tr><td colspan="10">Error loading action history.</td></tr>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchActionHistory();
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        document.querySelectorAll('.filter-icon').forEach(icon => {
+            icon.addEventListener('click', showFilterOptions);
+        });
+    });
+
+    function showFilterOptions(event) {
+        const column = event.target.dataset.column;
+        const rect = event.target.getBoundingClientRect();
+        const options = [...new Set(actionHistoryData.map(item => item[column]))];
+
+        let filterContainer = document.getElementById('filterContainer');
+        if (!filterContainer) {
+            filterContainer = document.createElement('div');
+            filterContainer.id = 'filterContainer';
+            filterContainer.className = 'filter-container';
+            document.body.appendChild(filterContainer);
+        }
+
+        filterContainer.innerHTML = options.map(option => 
+            `<div class="filter-option" data-value="${option}">${option}</div>`
+        ).join('');
+
+        filterContainer.style.top = `${rect.bottom + window.scrollY}px`;
+        filterContainer.style.left = `${rect.left + window.scrollX}px`;
+
+        filterContainer.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', () => applyFilter(column, option.dataset.value));
+        });
+    }
+
+    function applyFilter(column, value) {
+        const filteredData = actionHistoryData.filter(item => item[column] === value);
+        populateActionHistoryTable(filteredData);
+        document.getElementById('filterContainer').remove();
+    }
+    
+    function populateActionHistoryTable(actionHistory) {
+        const tableBody = document.getElementById('actionHistoryBody');
+        tableBody.innerHTML = '';
+    
+        actionHistory.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.REQUEST_NUMBER || ''}</td>
+                <td>${item.REQUEST_TYPE || ''}</td>
+                <td>${item.PROCESS_STATUS || ''}</td>
+                <td>${item.DOC_STATUS || ''}</td>
+                <td>${item.RESPONSE_DATE || ''}</td>
+                <td>${item.RESPONDED_BY || ''}</td>
+                <td>${item.RESPONDER_ROLE || ''}</td>
+                <td>${item.ACTION_PERFORMED || ''}</td>
+                <td>${item.NEXT_RESP || ''}</td>
+            `;
+            tableBody.appendChild(row);
+    
+            // Add click event to show comments
+            row.addEventListener('click', () => showComments(item.RESPONSE_COMMENTS));
+        });
+    }
+    
+    function showComments(comments) {
+        const commentsContent = document.getElementById('commentsContent');
+        commentsContent.textContent = comments || 'No comments available.';
+    }
+    </script>
+    
+</body>
+</html>
+

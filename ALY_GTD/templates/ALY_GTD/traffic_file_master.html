@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  {%load static %}
+  <link rel="stylesheet" href="{% static 'ALY_GTD/styles.css' %}" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+    <title>Traffic File Master</title>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #e6f2ff;
+            border: 1px solid #99ccff;
+            padding: 10px;
+            max-width: 100%;
+            overflow-x: hidden; /* Prevent horizontal overflow */
+            height:100%;
+          }
+    
+     
+          h1 {
+            background-color: #0066cc;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 17px;
+          }
+    
+          .fleet-master-nav {
+            /* position: sticky; */
+            top: 0;
+            /* z-index: 1020; */
+            background-color: transparent !important;
+            border: 2px solid #0d6efd;
+            border-radius: 5px;
+            padding-top: 0rem;
+            padding-bottom: 0rem;
+            margin-bottom:5px;
+            min-height: 30px;
+            width: 100%; /* Ensure full width */
+          }
+          
+          .fleet-master-nav .navbar-brand,
+          .fleet-master-nav .nav-link {
+            color: #0d6efd !important;
+          }
+          
+          .fleet-master-nav .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(13, 110, 253, 0.75)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+          }
+          
+          .fleet-master-nav .navbar-toggler {
+            border-color: #0d6efd;
+          }
+          
+          #fleetMasterContent .container {
+            margin-top: 20px;
+    
+          }
+          .fleet-master-nav .nav-link {
+            padding: 0;
+          }
+          .fleet-master-nav .nav-link i {
+            font-size: 20px;
+            padding:0px;
+          }
+          
+          .fleet-master-nav .nav-link span {
+            font-size: 15px;
+          }
+          
+          .navbar-nav {
+            width: 100%;
+          }
+          
+          .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 20px
+          }
+          
+          .nav-link {
+            white-space: nowrap;
+          }
+          .fleet-master-nav .d-flex.flex-column {
+            align-items: center;
+            justify-content: center;
+          }
+          
+          
+          #fleetMasterContent h1 {
+            margin-top: 0;
+          }
+    
+          @media (max-width: 991px) {
+            .navbar-nav {
+              flex-direction: column;
+            }
+            
+            .d-flex.justify-content-between {
+              flex-direction: column;
+            }
+          }
+    
+
+        .table-responsive {
+            overflow-y: auto;
+            max-height: 480px;
+            border: 1px solid #b6c7d6;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+
+        .table th,
+        .table td {
+            padding: 6px 8px;
+            font-size: 15px;
+            text-align: left;
+            border: 1px solid #e5e5e5;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table th {
+            background-color: #e4f1fe;
+            color: #000000;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            border-bottom: 1px solid #b6c7d6;
+        }
+
+        .table tbody tr {
+            background-color: #ffffff;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        .table tbody tr:hover {
+            background-color: #ffffd6;
+        }
+
+
+        .comments-section {
+            margin-top: 10px;
+            padding: 5px;
+            background-color: #f0f8ff;
+            border-top: 1px solid #a0a0a0;
+            text-align: center;
+            /* Center the "Comments" text */
+        }
+
+        .comments-section label {
+            display: block;
+            /* Make the label a block element */
+            margin-bottom: 5px;
+            /* Add some space below the label */
+        }
+
+        .comments-section textarea {
+            width: 99%;
+            height: 50px;
+            resize: none;
+            border: 1px solid #a0a0a0;
+            border-radius: 2px;
+            padding: 5px;
+            font-size: 12px;
+            color: #2c3e50;
+            background-color: #ffffff;
+        }
+
+        /* .btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            padding-left: 300px;
+          
+        } */
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            /* This will move the buttons to the right */
+            margin-top: 10px;
+            padding-right: 20px;
+            /* This adds some space from the right edge */
+        }
+
+
+        .btn-custom {
+            background-color: #f0f8ff;
+            border: 1px solid #a0a0a0;
+            color: #000000;
+            padding: 3px 15px;
+            font-size: 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            min-width: 110px;
+            height: 30px;
+            margin: 0 10px;
+        }
+
+        .btn-custom:hover {
+            background-color: #e6f0ff;
+        }
+
+
+        .form-control {
+            width: 100%;
+            padding: 2px 4px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        .table td {
+            padding: 2px;
+        }
+
+
+        /* Add custom scrollbar styles */
+        .table-responsive::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+      input,
+      select {
+        flex: 0.8;
+        padding: 2px;
+        border: 1px solid #ccc;
+        height: 36px;
+      }
+
+      .comments-section {
+        margin-bottom: 20px;
+      }
+
+      .comments-section textarea {
+        width: 100%;
+        height: 100px;
+        margin-top: 5px;
+      }
+
+      .button-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      button {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        margin-bottom: 5px;
+      }
+ 
+      .button-nav{
+        display:flex;
+        flex-direction:row;
+        width:90px;
+        margin-top:10px;
+      
+        input[type="file"],
+        .file-list,
+        .file-list * {
+          color: black !important;
+        }
+      
+        #insuranceTable input[type="file"],
+        #gpsTable input[type="file"],
+        #permitsTable input[type="file"],
+        #insuranceTable .file-list,
+        #gpsTable .file-list,
+        #permitsTable .file-list,
+        #insuranceTable .file-list *,
+        #gpsTable .file-list *,
+        #permitsTable .file-list * {
+          color: black !important;
+        }
+      }
+      
+      
+  .nav-btn {
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    margin-right: -10px;
+    margin-top:5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .nav-btn:hover {
+    background-color: #e2e6ea;
+  }
+  
+  .action-btn {
+    margin-left: 10px;
+    padding: 13px 20px;
+    font-weight: bold;
+    font-size: 15px;
+    color: #fff;
+    background-color: #99ccff;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    height: 55px;
+  }
+  
+        .button-btn {
+          margin-top: 10px;
+          float: left;
+          margin-left: 20px;
+          padding: 10px 20px;
+          font-weight: bold;
+          font-size: 15px;
+          color: #fff;
+          background-color: rgb(0, 149, 255);
+          border: none;
+          border-radius: 5px;
+        }
+        .button-btns {
+          margin-top: 10px;
+          float: left;
+          margin-left: 20px;
+          padding: 10px 20px;
+          font-weight: bold;
+          font-size: 15px;
+          color: #fff;
+          background-color: rgb(255, 0, 0);
+          border: none;
+          border-radius: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+          }
+          
+          .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+          }
+          
+          .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+
+
+          .status-field[value="Request For Cancellation"] {
+            color: red;
+            font-weight: solid;
+        }
+
+        .status-field[value="Inactive"] {
+            background-color: #ffcccc;
+            color: red;
+            font-weight: bold;
+        }
+        
+          
+
+
+        
+     
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 style="padding-bottom:12px;margin-bottom:5px; font-size: 20px; font-weight: bold">Traffic Master</h1>
+        <nav class="navbar navbar-expand-lg navbar-dark fleet-master-nav">
+          <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#fleetMasterNavbar" aria-controls="fleetMasterNavbar" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="fleetMasterNavbar">
+              <ul class="navbar-nav w-100">
+                <div class="d-flex justify-content-between w-100">
+                  <div class="d-flex">
+                  {% comment %} <li class="nav-item">
+                      <a class="nav-link active" aria-current="page" href="#" id="addRow">
+                        <button class="btn nav-btn" id="addTrafficFileRow">
+                          <box-icon name="list-plus" color="green" class="add-icon"></box-icon>
+                          <span style="font-size: 15px; color: black; margin-left: 5px;">Add Row</span>
+                      </button>
+                      </a>
+                    </li> {% endcomment %}
+                    <li class="nav-item">
+                      <a class="nav-link active" aria-current="page" href="#" id="removeRow">
+                        {% comment %} <button class="btn nav-btn" id="removeinsuranceRow">
+                          <box-icon name="list-minus" color="red" class="del-icon"></box-icon>
+                          <span style="font-size: 15px; color: black; margin-left: 5px;">Del Row</span>
+                      </button> {% endcomment %}
+                      </a>
+                    </li>
+                  </div>
+                  <div class="d-flex">
+                    <li class="nav-item approver-only-button">
+                        <a class="nav-link active" aria-current="page" href="#" id="sendForCancel">
+                            <button class="btn nav-btn" style="background-color: white; color: red;">
+                                <box-icon name='x-circle' color="red" class="del-icon"></box-icon>
+                                <span style="font-size: 15px; color: black; margin-left: 5px;">Send For Cancellation</span>
+                            </button>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="setActive">
+                            <button class="btn nav-btn non-approver-btn" id="setActiveBtn" data-approver-hidden="true">
+                                <box-icon name='check-circle' color="green" class="del-icon"></box-icon>
+                                <span style="font-size: 15px; color: black; margin-left: 5px;">Active</span>
+                              </button>
+                              
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="setInactive">
+                         
+<button class="btn nav-btn non-approver-btn" id="setInactiveBtn" data-approver-hidden="true">
+    <box-icon name='x-circle' color="red" class="del-icon"></box-icon>
+    <span style="font-size: 15px; color: black; margin-left: 5px;">Inactive</span>
+  </button>
+                        </a>
+                      </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#" id="submitForm">
+                          <button class="btn nav-btn" id="submitForm">
+                            <box-icon name='save'  color="black" class="del-icon"></box-icon>
+                            <span style="font-size: 15px; color: black; margin-left: 5px;">Submit</span>
+                          </button>
+                        </a>
+                      </li>
+                     
+                      
+                  
+                  </div>
+                  
+                </div>
+              </ul>
+            </div>
+          </div>
+        </nav>
+        <h1>Traffic File Master</h1>
+        <div class="table-responsive">
+            <table class="table" id="trafficTable">
+                <thead>
+                    <tr>
+                        <th>Traffic File #</th>
+                        <th>Company Name / Registration Under</th>
+                        <th>Trade License Number</th>
+                        <th>Emirates</th>
+                        <th>Federal Traffic File</th>
+                        <th>Salik Account #</th>
+                        <th>Status</th>
+                        <th>No. of Vehicles</th>
+                    </tr>
+                </thead>
+                <tbody id="trafficFileTableBody">
+                    <!-- Table rows will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="comments-section">
+            <label for="comments">Comments</label>
+            <textarea id="comments"></textarea>
+        </div>
+        
+        <div class="btn-container">
+            
+            <button class="btn-custom">Action History</button>
+            <button class="btn-custom" id="refreshButton">Refresh</button>
+
+            <button class="btn-custom" id="addTrafficFileRow">New</button>
+        </div>
+
+
+        <div id="loadingModal" class="modal">
+            <div class="modal-content">
+              <p>Submitting form and sending email...</p>
+              <div class="spinner"></div>
+            </div>
+          </div>
+          
+        
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const trafficFileNo = urlParams.get('traffic_file_no');
+        if (trafficFileNo) {
+            fetchAndDisplayTrafficFile(trafficFileNo);
+        }
+    });
+
+    async function fetchAndDisplayTrafficFile(trafficFileNo) {
+        try {
+            const response = await fetch(`/api/traffic-files/${trafficFileNo}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            populateTrafficFileData(data);
+        } catch (error) {
+            console.error('Error fetching traffic file:', error);
+            showErrorMessage('Failed to load traffic file data');
+        }
+    }
+
+    function populateTrafficFileData(data) {
+        const tableBody = document.getElementById('trafficFileTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+        
+        const row = createTableRow(data);
+        tableBody.innerHTML = row;
+        
+        const newRow = tableBody.querySelector('tr');
+        setupDropdownsForRow(newRow);
+        
+        // Disable all inputs for view-only mode
+        disableAllInputs(newRow);
+    }
+    
+
+
+    
+    
+
+    
+    document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const trafficFileNo = urlParams.get('TRAFFIC_FILE_NO');
+    const fromApprover = urlParams.get('from_approver') === 'true';
+    const isApprover = JSON.parse(document.getElementById('user_roles').textContent).is_approver;
+
+    setupPageBasedOnUserAndNavigation(trafficFileNo, fromApprover, isApprover);
+});
+
+function setupRequestorView() {
+    hideAllButtons();
+    makeAllFieldsReadOnly();
+}
+
+function setupNormalView(isApprover) {
+    fetchAndPopulateTable();
+    showAllButtons();
+    makeAllFieldsReadOnly();
+}
+
+function hideButtons(buttonIds) {
+    buttonIds.forEach(id => {
+        const button = document.getElementById(id);
+        if (button) button.style.display = 'none';
+    });
+}
+
+function hideAllButtons() {
+    const buttons = document.querySelectorAll('.nav-btn');
+    buttons.forEach(button => button.style.display = 'none');
+}
+
+function showAllButtons() {
+    const buttons = document.querySelectorAll('.nav-btn');
+    buttons.forEach(button => button.style.display = '');
+}
+
+function makeAllFieldsReadOnly() {
+    const inputs = document.querySelectorAll('#trafficFileTableBody input, #trafficFileTableBody select');
+    inputs.forEach(input => {
+        if (input.tagName === 'SELECT') {
+            input.disabled = true;
+        } else {
+            input.readOnly = true;
+        }
+    });
+}
+
+
+
+  // Function to show loading popup and handle email sending result
+  function showEmailSendingPopup(emailSendingPromise) {
+    // Create and show loading popup
+    const popup = document.createElement('div');
+    popup.className = 'email-sending-popup';
+    popup.innerHTML = `
+        <div class="email-sending-content">
+            <div class="loading-spinner"></div>
+            <p>Sending email...</p>
+        </div>
+    `;
+    document.body.appendChild(popup);
+
+    // Handle the email sending promise
+    emailSendingPromise
+        .then(result => {
+            updatePopupContent(popup, 'success', 'Email sent successfully!');
+        })
+        .catch(error => {
+            updatePopupContent(popup, 'error', 'Failed to send email. Please try again.');
+            console.error('Email sending error:', error);
+        })
+        .finally(() => {
+            // Remove popup after 3 seconds
+            setTimeout(() => {
+                document.body.removeChild(popup);
+            }, 3000);
+        });
+  }
+
+
+  function updatePopupContent(popup, status, message) {
+    const content = popup.querySelector('.email-sending-content');
+    content.innerHTML = `
+        <div class="${status}-icon"></div>
+        <p>${message}</p>
+    `;
+  }
+
+
+async function fetchAndPopulateTable() {
+    try {
+        console.log('Fetching traffic files data');
+        const response = await fetch('/api/traffic-files');
+        const data = await response.json();
+        console.log('Received traffic files data:', data);
+        
+        const tableBody = document.getElementById('trafficFileTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+        
+        data.forEach(file => {
+            const row = createTableRow(file);
+            const newRow = tableBody.insertAdjacentHTML('beforeend', row);
+            const lastRow = tableBody.lastElementChild;
+            lastRow.setAttribute('data-original', JSON.stringify(file));
+        });
+
+        console.log('Table populated, setting up dropdowns');
+        const rows = tableBody.querySelectorAll('tr');
+        rows.forEach(row => {
+            setupDropdownsForRow(row);
+        });
+
+        checkAndEnableEditForReturnedRows();
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+
+async function fetchAndPopulateSpecificTrafficFile(trafficFileNo) {
+    try {
+        console.log(`Fetching specific traffic file: ${trafficFileNo}`);
+        const response = await fetch(`/api/traffic-files/${trafficFileNo}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Received data:', data);
+        
+        const tableBody = document.getElementById('trafficFileTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+        
+        if (data && typeof data === 'object') {
+            const row = createTableRow(data);
+            tableBody.innerHTML = row;
+            const newRow = tableBody.querySelector('tr');
+            setupDropdownsForRow(newRow);
+            
+            // Populate the input fields
+            populateInputFields(newRow, data);
+            
+            // Disable all inputs and dropdowns for specific traffic file view
+            disableAllInputs(newRow);
+        } else {
+            console.error('Invalid data returned for the specific traffic file:', data);
+            tableBody.innerHTML = '<tr><td colspan="8">No data available for this traffic file.</td></tr>';
+        }
+    } catch (error) {
+        console.error('Error fetching specific traffic file:', error);
+        const tableBody = document.getElementById('trafficFileTableBody');
+        tableBody.innerHTML = '<tr><td colspan="8">Error loading traffic file data.</td></tr>';
+    }
+}
+
+function populateInputFields(row, data) {
+    const inputs = row.querySelectorAll('input, select');
+    inputs[0].value = data.TRAFFIC_FILE_NO || '';
+    inputs[1].value = data.COMPANY_NAME || '';
+    inputs[2].value = data.TRADE_LICENSE_NO || '';
+    inputs[3].value = data.EMIRATES || '';
+    inputs[4].value = data.FEDERAL_TRAFFIC_FILE_NO || '';
+    inputs[5].value = data.SALIK_ACCOUNT_NO || '';
+    inputs[6].value = data.STATUS || '';
+    inputs[7].value = data.NO_OF_VEHICLES || '0';
+}
+
+function disableAllInputs(row) {
+    const inputs = row.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.tagName === 'SELECT') {
+            input.disabled = true;
+        } else {
+            input.readOnly = true;
+        }
+    });
+}
+
+
+
+
+
+
+function createTableRow(file) {
+    return `
+        <tr data-id="${file.TRAFFIC_FILE_ID}">
+            <td><input type="text" class="form-control" value="${file.TRAFFIC_FILE_NO || ''}" readonly></td>
+            <td><select class="form-control" name="COMPANY NAME_LOOKUP_NAME"><option value="${file.COMPANY_NAME || ''}">${file.COMPANY_NAME || ''}</option></select></td>
+            <td><input type="text" class="form-control" value="${file.TRADE_LICENSE_NO || ''}" readonly></td>
+            <td><select class="form-control" name="AE_EMIRATES_LOOKUP_NAME"><option value="${file.EMIRATES || ''}">${file.EMIRATES || ''}</option></select></td>
+            <td><input type="text" class="form-control" value="${file.FEDERAL_TRAFFIC_FILE_NO || ''}" readonly></td>
+            <td><input type="text" class="form-control" value="${file.SALIK_ACCOUNT_NO || ''}" readonly></td>
+            <td><input type="text" class="form-control status-field" value="${file.STATUS || ''}" readonly></td>
+            <td><input type="text" class="form-control vehicle-number" value="${file.NO_OF_VEHICLES || '0'}" readonly></td>
+        </tr>
+    `;
+}
+
+
+function checkAndEnableEditForReturnedRows() {
+    const rows = document.querySelectorAll('#trafficFileTableBody tr');
+    rows.forEach(row => {
+        const statusInput = row.querySelector('.status-field');
+        if (statusInput && statusInput.value === 'Return for Correction') {
+            enableEditForRow(row);
+        } else {
+            disableEditForNonReturnedRows(row);
+        }
+    });
+}
+
+function disableEditForNonReturnedRows(row) {
+    const inputs = row.querySelectorAll('input:not(.status-field):not(.vehicle-number)');
+    inputs.forEach(input => input.readOnly = true);
+    const companyNameSelect = row.querySelector('select[name="COMPANY NAME_LOOKUP_NAME"]');
+    const emiratesSelect = row.querySelector('select[name="AE_EMIRATES_LOOKUP_NAME"]');
+    if (companyNameSelect) companyNameSelect.disabled = true;
+    if (emiratesSelect) emiratesSelect.disabled = true;
+}
+
+function enableEditForRow(row) {
+    const inputs = row.querySelectorAll('input:not(.status-field):not(.vehicle-number)');
+    inputs.forEach(input => input.readOnly = false);
+    const companyNameSelect = row.querySelector('select[name="COMPANY NAME_LOOKUP_NAME"]');
+    const emiratesSelect = row.querySelector('select[name="AE_EMIRATES_LOOKUP_NAME"]');
+    companyNameSelect.disabled = false;
+    emiratesSelect.disabled = false;
+    setupDropdownForCell(companyNameSelect, 'COMPANY NAME_LOOKUP_NAME');
+    setupDropdownForCell(emiratesSelect, 'AE_EMIRATES_LOOKUP_NAME');
+}
+
+function updateStatus(status) {
+    const statusInput = document.querySelector('#trafficFileTableBody tr:last-child .status-field');
+    if (statusInput) {
+        statusInput.value = status;
+        submitForm();
+    }
+}
+
+function updateStatus(status) {
+    approverAction(status);
+}
+
+
+function setupPageBasedOnUserAndNavigation(trafficFileNo, fromApprover, isApprover) {
+    if (fromApprover) {
+        if (isApprover) {
+            setupApproverView(trafficFileNo);
+        } else {
+            setupRequestorView();
+        }
+    } else {
+        setupNormalView(isApprover);
+    }
+    
+    
+}
+
+function setupApproverView(trafficFileNo) {
+    hideButtons(['addTrafficFileRow', 'removeRow','sendForCancel', 'setActive','setInactive']);
+    if (JSON.parse(document.getElementById('user_roles').textContent).is_approver) {
+        replaceSubmitWithApproverButtons();
+    }
+    makeAllFieldsReadOnly();
+    if (trafficFileNo) {
+        fetchAndPopulateSpecificTrafficFile(trafficFileNo);
+    }
+}
+
+function replaceSubmitWithApproverButtons() {
+    const submitButton = document.getElementById('submitForm');
+    if (submitButton && !document.querySelector('.approver-btn')) {
+        const approverButtons = `
+            <button class="btn nav-btn approver-btn" onclick="updateStatus('Active')">
+                <box-icon name='check-circle' color="green"></box-icon>
+                <span style="font-size: 15px; color: black; margin-left: 5px;">Active</span>
+            </button>
+            <button class="btn nav-btn approver-btn" onclick="updateStatus('Inactive')">
+                <box-icon name='x-circle' color="red"></box-icon>
+                <span style="font-size: 15px; color: black; margin-left: 5px;">Inactive</span>
+            </button>
+            <button class="btn nav-btn approver-btn" onclick="updateStatus('Return for Correction')">
+                <box-icon name='revision' color="orange"></box-icon>
+                <span style="font-size: 15px; color: black; margin-left: 5px;">Return for Correction</span>
+            </button>
+        `;
+        submitButton.insertAdjacentHTML('afterend', approverButtons);
+        submitButton.style.display = 'none';
+    }
+}
+
+
+function replaceSendForCancellationWithApproverButtons() {
+    const sendForCancelButton = document.getElementById('sendForCancel');
+    if (sendForCancelButton && !document.querySelector('.approver-btn')) {
+        const approverButtons = `
+            <button class="btn nav-btn approver-btn" onclick="updateStatus('Active')">
+                <box-icon name='check-circle' color="green"></box-icon>
+                <span style="font-size: 15px; color: black; margin-left: 5px;">Active</span>
+            </button>
+            <button class="btn nav-btn approver-btn" onclick="updateStatus('Inactive')">
+                <box-icon name='x-circle' color="red"></box-icon>
+                <span style="font-size: 15px; color: black; margin-left: 5px;">Inactive</span>
+            </button>
+            <button class="btn nav-btn approver-btn" onclick="updateStatus('Return for Correction')">
+                <box-icon name='revision' color="orange"></box-icon>
+                <span style="font-size: 15px; color: black; margin-left: 5px;">Return for Correction</span>
+            </button>
+        `;
+        sendForCancelButton.closest('.nav-item').insertAdjacentHTML('afterend', approverButtons);
+        sendForCancelButton.closest('.nav-item').style.display = 'none';
+    }
+}
+
+async function submitForm() {
+    const trafficRows = document.querySelectorAll('#trafficFileTableBody tr');
+    const formData = new FormData();
+    let comparisonData = [];
+
+    trafficRows.forEach((row, index) => {
+        const inputs = row.querySelectorAll('input, select');
+        const id = row.getAttribute('data-id') || 'new';
+        const currentStatus = inputs[6].value;
+
+        const rowData = {
+            TRAFFIC_FILE_ID: id,
+            TRAFFIC_FILE_NO: inputs[0].value,
+            COMPANY_NAME: inputs[1].value,
+            TRADE_LICENSE_NO: inputs[2].value,
+            EMIRATES: inputs[3].value,
+            FEDERAL_TRAFFIC_FILE_NO: inputs[4].value,
+            SALIK_ACCOUNT_NO: inputs[5].value,
+            STATUS: currentStatus === 'Return for Correction' ? 'Pending for Approval' : currentStatus
+        };
+
+        Object.entries(rowData).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+
+
+        if (currentStatus === 'Return for Correction') {
+            const originalData = JSON.parse(row.getAttribute('data-original') || '{}');
+            Object.entries(rowData).forEach(([key, value]) => {
+                if (originalData[key] !== value && key !== 'STATUS') {
+                    comparisonData.push({
+                        column: key,
+                        previousValue: originalData[key] || '',
+                        newValue: value
+                    });
+                }
+            });
+        }
+    });
+
+    formData.append('COMMENTS', document.getElementById('comments').value);
+    formData.append('comparison_data', JSON.stringify(comparisonData));
+
+    debouncedSendFormData(formData);
+}
+
+const debouncedApproverAction = debounce(async (formData, newStatus) => {
+    try {
+        await sendApproverEmailAndUpdateStatus(formData, newStatus);
+        showSuccessMessage(`Traffic File status updated to ${newStatus} and email sent successfully!`);
+        
+        // Add a slight delay before reloading the page
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500); // 1.5 seconds delay
+    } catch (error) {
+        showErrorMessage(`An error occurred: ${error.message}`);
+    }
+}, 1000);
+
+
+
+
+
+ const debouncedSendFormData = debounce(async (formData) => {
+    try {
+        showLoadingIndicator();
+
+        const response = await fetch('http://127.0.0.1:8000/api/traffic-file-master', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Server response:', data);
+
+        updateTableWithSubmittedData(formData);
+
+        const lookupValue = formData.get('STATUS') === 'Pending for Approval' ? 'EDIT_TFM_MASTER' : 'NEW_TFM_MASTER';
+        const emailSetup = await fetchEmailSetup(lookupValue);
+        const emailData = prepareEmailSubmitData(formData, emailSetup);
+
+        const emailResponse = await fetch('http://127.0.0.1:8000/api/send-traffic-email', {
+            method: 'POST',
+            body: emailData
+        });
+
+        if (!emailResponse.ok) {
+            throw new Error(`Failed to send email. Status: ${emailResponse.status}`);
+        }
+
+        const emailResult = await emailResponse.json();
+        console.log('Email sending result:', emailResult);
+
+        hideLoadingIndicator();
+        showSuccessMessage('Traffic File Master information submitted and email sent successfully!');
+
+        // Add a slight delay before reloading the page
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500); // 1.5 seconds delay
+
+    } catch (error) {
+        console.error('Detailed error:', error);
+        hideLoadingIndicator();
+        showErrorMessage(`An error occurred: ${error.message}`);
+    }
+}, 1000);
+
+
+
+function showLoadingIndicator() {
+    console.log('Showing loading indicator');
+    document.getElementById('loadingModal').style.display = 'block';
+}
+
+function hideLoadingIndicator() {
+    console.log('Hiding loading indicator');
+    document.getElementById('loadingModal').style.display = 'none';
+}
+
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+
+
+
+
+
+
+
+
+
+async function approverAction(newStatus) {
+    const trafficRows = document.querySelectorAll('#trafficFileTableBody tr');
+    const formData = new FormData();
+
+    trafficRows.forEach((row, index) => {
+        const inputs = row.querySelectorAll('input, select');
+        const id = row.getAttribute('data-id') || 'new';
+
+        formData.append(`TRAFFIC_FILE_ID`, id);
+        formData.append(`TRAFFIC_FILE_NO`, inputs[0].value);
+        formData.append(`COMPANY_NAME`, inputs[1].value);
+        formData.append(`TRADE_LICENSE_NO`, inputs[2].value);
+        formData.append(`EMIRATES`, inputs[3].value);
+        formData.append(`FEDERAL_TRAFFIC_FILE_NO`, inputs[4].value);
+        formData.append(`SALIK_ACCOUNT_NO`, inputs[5].value);
+        formData.append(`STATUS`, newStatus);
+    });
+
+    formData.append('comments', document.getElementById('comments').value);
+
+    debouncedApproverAction(formData, newStatus);
+}
+
+
+async function sendApproverEmailAndUpdateStatus(formData, newStatus) {
+    try {
+        showLoadingIndicator();
+
+        const lookupName = newStatus === 'Active' ? 'APPROVE_TFM_MASTER' :
+                           newStatus === 'Inactive' ? 'CANCEL_TFM_MASTER' : 'RFC_TFM_MASTER';
+        const emailSetup = await fetchEmailSetup(lookupName);
+        const emailData = new FormData();
+
+        emailData.append('recipient', emailSetup.find(item => item.LOOKUP_CODE === 'TO').MEANING);
+        emailData.append('cc', emailSetup.find(item => item.LOOKUP_CODE === 'CC').MEANING);
+
+        const trafficFileNo = formData.get('TRAFFIC_FILE_NO');
+        let subject;
+        let customMessage;
+        switch(newStatus) {
+            case 'Active':
+                subject = `FYI : Traffic File Details ${trafficFileNo} : Has been approved`;
+                customMessage = 'The traffic file details have been approved. Please find the approved details below:';
+                break;
+            case 'Inactive':
+                subject = `FYI: Traffic File Details ${trafficFileNo} : Has been Rejected`;
+                customMessage = 'The traffic file details have been rejected. Please find the rejected details below:';
+                break;
+            case 'Return for Correction':
+                subject = `FYI : Traffic File Details ${trafficFileNo} : Has been Sent For Return For Correction`;
+                customMessage = 'The traffic file details have been returned for correction. Please review and make necessary changes:';
+                break;
+            default:
+                subject = `Traffic File Details ${trafficFileNo} are Modified`;
+                customMessage = 'The traffic file details have been updated. Please find the updated details below:';
+        }
+        emailData.append('subject', subject);
+        emailData.append('custom_message', customMessage);
+
+        emailData.append('data', JSON.stringify(Object.fromEntries(formData)));
+        emailData.append('is_new_submission', false);
+
+        const response = await fetch('http://127.0.0.1:8000/api/traffic-file-master', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to update status. Status: ${response.status}`);
+        }
+
+        const emailResponse = await fetch('http://127.0.0.1:8000/api/send-traffic-email', {
+            method: 'POST',
+            body: emailData
+        });
+
+        if (!emailResponse.ok) {
+            throw new Error(`Failed to send email. Status: ${emailResponse.status}`);
+        }
+
+        const result = await emailResponse.json();
+        console.log(`${newStatus} email sending and status update result:`, result);
+
+        hideLoadingIndicator();
+        showSuccessMessage(`Traffic File ${trafficFileNo} status updated to ${newStatus} and email sent successfully!`);
+    } catch (error) {
+        console.error('Detailed error:', error);
+        hideLoadingIndicator();
+        showErrorMessage(`An error occurred: ${error.message}`);
+    }
+}
+
+
+async function fetchEmailSetup(lookupValue) {
+    const response = await fetch(`http://127.0.0.1:8000/api/related-data/?lookup_value=${lookupValue}`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch email setup. Status: ${response.status}`);
+    }
+    return await response.json();
+}
+
+async function sendFormData(formData) {
+    try {
+        showLoadingIndicator();
+
+        const response = await fetch('http://127.0.0.1:8000/api/traffic-file-master', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Server response:', data);
+
+        updateTableWithSubmittedData(formData);
+
+        const lookupValue = formData.get('STATUS') === 'Pending for Approval' ? 'EDIT_TFM_MASTER' : 'NEW_TFM_MASTER';
+        const emailSetup = await fetchEmailSetup(lookupValue);
+        const emailData = prepareEmailSubmitData(formData, emailSetup);
+
+        const emailResponse = await fetch('http://127.0.0.1:8000/api/send-traffic-email', {
+            method: 'POST',
+            body: emailData
+        });
+
+        if (!emailResponse.ok) {
+            throw new Error(`Failed to send email. Status: ${emailResponse.status}`);
+        }
+
+        const emailResult = await emailResponse.json();
+        console.log('Email sending result:', emailResult);
+
+        hideLoadingIndicator();
+        showSuccessMessage('Traffic File Master information submitted and email sent successfully!');
+    } catch (error) {
+        console.error('Detailed error:', error);
+        hideLoadingIndicator();
+        showErrorMessage(`An error occurred: ${error.message}`);
+    }
+}
+
+
+async function sendEmail(formData) {
+    const status = formData.get('STATUS');
+    const lookupName = status === 'Pending for Approval' ? 'NEW_TFM_MASTER' : 'EDIT_TFM_MASTER';
+
+    const emailSetup = await fetchEmailSetup(lookupName);
+    const emailData = prepareEmailSubmitData(formData, emailSetup);
+
+    const response = await fetch('http://127.0.0.1:8000/api/send-traffic-email', {
+        method: 'POST',
+        body: emailData
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to send email. Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('Email sending result:', result);
+}
+
+
+
+async function fetchEmailAddresses() {
+    try {
+        const response = await fetch('/api/related-data/?lookup_name=EMAIL_SETUPS');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const toEmail = data.find(item => item.LOOKUP_VALUE === 'TO' && item.LOOKUP_CODE === 'NEW_TFM_MASTER')?.MEANING;
+        const ccEmail = data.find(item => item.LOOKUP_VALUE === 'CC' && item.LOOKUP_CODE === 'NEW_TFM_MASTER')?.MEANING;
+        return { toEmail, ccEmail };
+    } catch (error) {
+        console.error('Error fetching email addresses:', error);
+        return { toEmail: '', ccEmail: '' };
+    }
+}
+
+function updateTableWithSubmittedData(formData) {
+    const tableBody = document.getElementById('trafficFileTableBody');
+    const row = tableBody.querySelector('tr');
+    if (row) {
+        const inputs = row.querySelectorAll('input, select');
+        if (inputs.length > 0) {
+            inputs[0].value = formData.get('TRAFFIC_FILE_NO') || '';
+            inputs[1].value = formData.get('COMPANY_NAME') || '';
+            inputs[2].value = formData.get('TRADE_LICENSE_NO') || '';
+            inputs[3].value = formData.get('EMIRATES') || '';
+            inputs[4].value = formData.get('FEDERAL_TRAFFIC_FILE_NO') || '';
+            inputs[5].value = formData.get('SALIK_ACCOUNT_NO') || '';
+            inputs[6].value = formData.get('STATUS') || '';
+            
+            // Apply highlighting for Request For Cancellation and Inactive status
+            const status = formData.get('STATUS');
+            if (status === 'Request For Cancellation' || status === 'Inactive') {
+                inputs[6].classList.add('highlighted-status');
+            } else {
+                inputs[6].classList.remove('highlighted-status');
+            }
+        }
+    }
+    checkAndEnableEditForReturnedRows();
+}
+
+
+function showSuccessMessage(message) {
+    alert(message);
+}
+
+function showErrorMessage(message) {
+    alert(message);
+}
+
+
+
+
+
+
+
+ function prepareEmailSubmitData(formData, emailSetup) {
+    const emailData = new FormData();
+    const selectedRow = document.querySelector('#trafficFileTableBody tr.selected');
+    const trafficFileNo = selectedRow ? selectedRow.querySelector('input[type="text"]').value : 'Unknown';
+    
+    emailData.append('recipient', emailSetup.find(item => item.LOOKUP_CODE === 'TO').MEANING);
+    emailData.append('cc', emailSetup.find(item => item.LOOKUP_CODE === 'CC').MEANING);
+    emailData.append('subject', `Action Required : New Traffic File ${trafficFileNo} : Required for your Approval`);
+    emailData.append('custom_message', 'Below Are the Details:');
+    emailData.append('data', JSON.stringify(Object.fromEntries(formData)));
+    emailData.append('is_new_submission', formData.get('STATUS') === 'Pending for Approval');
+    emailData.append('comparison_data', formData.get('comparison_data'));
+    
+    return emailData;
+}
+
+function prepareEmailCancellationData(formData, emailSetup) {
+    const emailData = new FormData();
+    const selectedRow = document.querySelector('#trafficFileTableBody tr.selected');
+    const trafficFileNo = selectedRow ? selectedRow.querySelector('input[type="text"]').value : 'Unknown';
+    
+    emailData.append('recipient', emailSetup.find(item => item.LOOKUP_CODE === 'TO').MEANING);
+    emailData.append('cc', emailSetup.find(item => item.LOOKUP_CODE === 'CC').MEANING);
+    emailData.append('subject', `Action Required : Traffic File ${trafficFileNo} : Request For Cancellation`);
+    emailData.append('custom_message', 'Below Are the Details:');
+    emailData.append('data', JSON.stringify(Object.fromEntries(formData)));
+    emailData.append('is_new_submission', formData.get('STATUS') === 'Request For Cancellation');
+    emailData.append('comparison_data', formData.get('comparison_data'));
+    
+    return emailData;
+}
+
+
+function setupTrafficFileSelection() {
+    const tbody = document.getElementById('trafficFileTableBody');
+    tbody.addEventListener('click', function(e) {
+        const row = e.target.closest('tr');
+        if (row) {
+            tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+            row.classList.add('selected');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', setupTrafficFileSelection);
+
+
+
+
+function addTrafficFileRow() {
+    const tbody = document.getElementById('trafficFileTableBody');
+    const newRow = tbody.insertRow();
+    newRow.innerHTML = `
+        <td><input type="text" class="form-control"></td>
+        <td><select class="form-control" name="COMPANY NAME_LOOKUP_NAME"><option value=""></option></select></td>
+        <td><input type="text" class="form-control"></td>
+        <td><select class="form-control" name="AE_EMIRATES_LOOKUP_NAME"><option value=""></option></select></td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control status-field" value="Pending for Approval" readonly></td>
+        <td><input type="text" class="form-control vehicle-number" value="0" readonly></td>
+    `;
+    newRow.setAttribute('data-id', 'new');
+    newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    newRow.querySelector('input').focus();
+    setupDropdownsForRow(newRow);
+}
+
+function setupDropdownsForRow(row) {
+    console.log('Setting up dropdowns for row');
+    setupDropdownForCell(row.querySelector('select[name="COMPANY NAME_LOOKUP_NAME"]'), 'COMPANY NAME_LOOKUP_NAME');
+    setupDropdownForCell(row.querySelector('select[name="AE_EMIRATES_LOOKUP_NAME"]'), 'AE_EMIRATES_LOOKUP_NAME');
+}
+
+function setupDropdownForCell(dropdown, lookupName) {
+    console.log(`Setting up dropdown for ${lookupName}`);
+    
+    if (!dropdown.hasAttribute('data-setup')) {
+        dropdown.addEventListener("click", () => {
+            if (!dropdown.hasAttribute('data-fetched')) {
+                fetchDropdownOptions(lookupName, dropdown);
+            }
+        });
+
+        dropdown.addEventListener("change", function () {
+            this.setAttribute("data-selected", this.value);
+            console.log(`${lookupName} value changed to:`, this.value);
+        });
+
+        dropdown.setAttribute('data-setup', 'true');
+    }
+}
+
+async function fetchDropdownOptions(lookupName, dropdown) {
+    try {
+        const originalLookupName = lookupName;
+        lookupName = lookupName.replace('_LOOKUP_NAME', '');
+        
+        console.log(`Fetching options for ${lookupName}`);
+        const response = await fetch(`/api/dropdown-options/?lookup_name=${encodeURIComponent(lookupName)}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log(`Received data for ${lookupName}:`, data);
+        
+        if (data.meanings && Array.isArray(data.meanings)) {
+            populateDropdown(dropdown, data.meanings);
+        } else {
+            console.error(`Invalid data format for ${lookupName}:`, data);
+            populateDropdown(dropdown, ['Error: Invalid data format']);
+        }
+
+        dropdown.setAttribute('data-fetched', 'true');
+    } catch (error) {
+        console.error(`Error fetching dropdown options for ${lookupName}:`, error);
+        populateDropdown(dropdown, ['Error loading options']);
+    }
+}
+
+function populateDropdown(dropdown, options) {
+    console.log(`Populating dropdown for ${dropdown.name} with options:`, options);
+    
+    const currentValue = dropdown.value;
+
+    dropdown.innerHTML = '<option value=""></option>';
+
+    options.forEach((option) => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        dropdown.appendChild(opt);
+    });
+
+    if (options.includes(currentValue)) {
+        dropdown.value = currentValue;
+    }
+
+    console.log(`Dropdown ${dropdown.name} populated. Final options:`, Array.from(dropdown.options).map(opt => opt.value));
+}
+
+document.getElementById('addTrafficFileRow').addEventListener('click', addTrafficFileRow);
+
+document.getElementById('removeRow').addEventListener('click', function() {
+    const tbody = document.querySelector('#trafficTable tbody');
+    const rows = tbody.getElementsByTagName('tr');
+    
+    for (let i = rows.length - 1; i >= 0; i--) {
+        const inputs = rows[i].getElementsByTagName('input');
+        let isEmpty = true;
+        
+        for (let input of inputs) {
+            if (input.value.trim() !== '') {
+                isEmpty = false;
+                break;
+            }
+        }
+        
+        if (isEmpty) {
+            tbody.removeChild(rows[i]);
+            console.log('Empty row removed');
+            return;
+        }
+    }
+    
+    console.log('No empty rows to delete');
+});
+
+document.getElementById('submitForm').addEventListener('click', submitForm);
+
+document.addEventListener('DOMContentLoaded', function() {
+    const submitButton = document.getElementById('submitForm');
+    if (submitButton) {
+        submitButton.addEventListener('click', submitForm);
+    }
+
+    const refreshButton = document.getElementById('refreshButton');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', refreshPage);
+    }
+
+    const actionHistoryButton = document.querySelector('.btn-custom');
+    if (actionHistoryButton) {
+        actionHistoryButton.addEventListener('click', function() {
+            window.location.href = '/ALY_GTD/traffic_action_history/';
+        });
+    }
+
+    const approverButtons = document.querySelectorAll('.approver-btn');
+    approverButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const status = this.textContent.trim();
+            approverAction(status);
+        });
+    });
+});
+
+function refreshPage() {
+    // Reload the current page
+    window.location.reload();
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sendForCancelButton = document.getElementById('sendForCancel');
+    if (sendForCancelButton) {
+        sendForCancelButton.addEventListener('click', sendForCancellation);
+    }
+});
+
+
+
+const sendForCancellation = debounce(async (event) => {
+    event.preventDefault();
+    const selectedRow = document.querySelector('#trafficFileTableBody tr.selected');
+    if (!selectedRow) {
+        showErrorMessage('Please select a Traffic File record before sending for cancellation.');
+        return;
+    }
+
+    const inputs = selectedRow.querySelectorAll('input, select');
+    const formData = new FormData();
+
+    inputs.forEach((input, index) => {
+        const key = ['TRAFFIC_FILE_NO', 'COMPANY_NAME', 'TRADE_LICENSE_NO', 'EMIRATES', 'FEDERAL_TRAFFIC_FILE_NO', 'SALIK_ACCOUNT_NO', 'STATUS'][index];
+        formData.append(key, input.value);
+    });
+
+    formData.append('STATUS', 'Request For Cancellation');
+    formData.append('COMMENTS', document.getElementById('comments').value);
+    formData.append('TRAFFIC_FILE_ID', selectedRow.getAttribute('data-id'));
+
+    try {
+        showLoadingIndicator();
+
+        const response = await fetch('http://127.0.0.1:8000/api/traffic-file-master', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Server response:', data);
+
+        updateTableWithSubmittedData(formData);
+
+        const emailSetup = await fetchEmailSetup('CANCEL_TFM_MASTER');
+        const emailData = prepareEmailCancellationData(formData, emailSetup);
+
+        const emailResponse = await fetch('http://127.0.0.1:8000/api/send-traffic-email', {
+            method: 'POST',
+            body: emailData
+        });
+
+        if (!emailResponse.ok) {
+            throw new Error(`Failed to send email. Status: ${emailResponse.status}`);
+        }
+
+        const emailResult = await emailResponse.json();
+        console.log('Email sending result:', emailResult);
+
+        hideLoadingIndicator();
+        showSuccessMessage('Traffic File sent for cancellation successfully!');
+    } catch (error) {
+        console.error('Detailed error:', error);
+        hideLoadingIndicator();
+        showErrorMessage(`An error occurred: ${error.message}`);
+    }
+}, 1000);
+
+
+
+function createTableRow(file) {
+   const statusClass = (file.STATUS === 'Request For Cancellation' || file.STATUS === 'Inactive') ? 'highlighted-status' : '';
+    return `
+        <tr data-id="${file.TRAFFIC_FILE_ID}">
+            <td><input type="text" class="form-control" value="${file.TRAFFIC_FILE_NO || ''}" readonly></td>
+            <td><select class="form-control" name="COMPANY NAME_LOOKUP_NAME"><option value="${file.COMPANY_NAME || ''}">${file.COMPANY_NAME || ''}</option></select></td>
+            <td><input type="text" class="form-control" value="${file.TRADE_LICENSE_NO  || ''}" readonly></td>
+            <td><select class="form-control" name="AE_EMIRATES_LOOKUP_NAME"><option value="${file.EMIRATES  || ''}">${file.EMIRATES  || ''}</option></select></td>
+            <td><input type="text" class="form-control" value="${file.FEDERAL_TRAFFIC_FILE_NO  || ''}" readonly></td>
+            <td><input type="text" class="form-control" value="${file.SALIK_ACCOUNT_NO  || ''}" readonly></td>
+            <td><input type="text" class="form-control status-field ${statusClass}" value="${file.STATUS  || ''}" readonly></td>
+            <td><input type="text" class="form-control vehicle-number" value="${file.NO_OF_VEHICLES || '0'}" readonly></td>
+        </tr>
+    `;
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const setActiveButton = document.getElementById('setActiveBtn');
+    if (setActiveButton) {
+        setActiveButton.addEventListener('click', () => updateStatus('Active'));
+    }
+
+    const setInactiveButton = document.getElementById('setInactiveBtn');
+    if (setInactiveButton) {
+        setInactiveButton.addEventListener('click', () => updateStatus('Inactive'));
+    }
+});
+
+
+
+function updateStatus(newStatus) {
+    const selectedRow = document.querySelector('#trafficFileTableBody tr.selected');
+    if (!selectedRow) {
+        showErrorMessage('Please select a Traffic File record before updating status.');
+        return;
+    }
+
+    const statusInput = selectedRow.querySelector('.status-field');
+    statusInput.value = newStatus;
+
+    if (newStatus === 'Inactive') {
+        statusInput.classList.add('highlighted-status');
+    } else {
+        statusInput.classList.remove('highlighted-status');
+    }
+
+    // Create a new FormData object with the updated status
+    const formData = new FormData();
+    const inputs = selectedRow.querySelectorAll('input, select');
+    inputs.forEach((input, index) => {
+        const key = ['TRAFFIC_FILE_NO', 'COMPANY_NAME', 'TRADE_LICENSE_NO', 'EMIRATES', 'FEDERAL_TRAFFIC_FILE_NO', 'SALIK_ACCOUNT_NO', 'STATUS'][index];
+        formData.append(key, input.value);
+    });
+    formData.append('TRAFFIC_FILE_ID', selectedRow.getAttribute('data-id'));
+    formData.append('STATUS', newStatus);
+
+    // Call debouncedSendFormData with the new formData
+    debouncedSendFormData(formData);
+}
+
+
+
+
+
+
+         </script>
+
+
+            <script id="user_roles" type="application/json">
+  { "is_approver": {% if request.session.is_approver %}true{% else %}false{% endif %} }
+</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="{% static 'transactions/script.js' %}"></script>
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+  
+</body>
+</html>

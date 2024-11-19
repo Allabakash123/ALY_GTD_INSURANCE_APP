@@ -45,6 +45,14 @@ SECRET_KEY = 'django-insecure-f8k)eq6szikr6@(-$=$o0&dtfgp)ycvogbjq$gbs)4eo8f1st7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# try:
+#     ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+    
+# except:
+#     ALLOWED_HOSTS = ['192.168.57.90','localhost','127.0.0.1']
+#     # ALLOWED_HOSTS = []
+
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -62,21 +70,22 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'import_export',
-  
+    'rest_framework.authtoken',
     'core',
     'simple_history',
     
     'rest_framework_datatables',
- 
     'accounts',
     'crequest',
     'setup',
     'sequences.apps.SequencesConfig',
     'django_drf_filepond',
     "sslserver",
-
+    
     "pricelist_update",
+    "ALY_GTD"
 ]
+AUTH_USER_MODEL = 'ALY_GTD.CustomUser'
 
 
 MIDDLEWARE = [
@@ -85,15 +94,25 @@ MIDDLEWARE = [
 
 
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     'crequest.middleware.CrequestMiddleware',
+    
 
     'core.middleware.CustomSessionVarHandler',
 ]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:51825",
+    # Add other allowed origins as needed
+]
+
+
 
 if env('DEBUG_TOOLBAR') == 'Y':
     INSTALLED_APPS += [
@@ -134,6 +153,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ay_connect.wsgi.application'
+
+default_app_config = 'ALY_GTD.apps.ALY_GTDConfig'
 
 
 # Database
@@ -204,7 +225,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Dubai'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -215,11 +236,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 
-STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR,'static')
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'), BASE_DIR / "static",
+    BASE_DIR / 'static'
 ]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# STATIC_URL = '/static/'
+# # STATIC_ROOT = os.path.join(BASE_DIR,'static')
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'), BASE_DIR / "static",
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -257,6 +285,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework_datatables.renderers.DatatablesRenderer',
     ),
     'DEFAULT_FILTER_BACKENDS': (
@@ -268,11 +297,14 @@ REST_FRAMEWORK = {
 
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR.joinpath("media/")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
 
+ADMIN_EMAIL = 'farhanabadubhai@gmail.com'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_PORT = env('EMAIL_PORT')

@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ALY_GTD/styles.css' %}" />
+    <title>Look Up Master</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        
+      }
+
+      .container {
+        background-color: #e6f2ff;
+        border: 1px solid #99ccff;
+        padding: 10px;
+        max-width: 100%;
+        overflow-x: hidden;
+        max-height: 100%;
+        height: 100vh;
+        position: relative;
+      }
+
+      .search-section,
+      .name-section,
+      .meaning-section {
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      .search-section{
+        margin-top: 20px;
+      }
+
+
+      .name-section input,
+      .meaning-section input {
+        background-color: #ffffe0; /* Light yellow */
+      }
+
+      label {
+        display: inline-block;
+        width: 100px;
+        font-weight: bold;
+      }
+
+      .input-box {
+        width: 300px;
+        padding: 8px;
+        border: 1px solid #cccccc;
+        border-radius: 4px;
+      }
+
+      .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+      }
+
+
+      .table-input.list-code,
+      .table-input.list-value,
+      .table-input.meaning,
+      .table-input.start-date {
+        background-color: #ffffe0; /* Light yellow */
+      }
+
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 8px;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+      }
+
+      .table-input {
+        width: 100%;
+        padding: 8px;
+        border: none;
+        background-color: #ffffe0;
+      }
+
+      .table-input:focus {
+        outline: none;
+        background-color: #e6ffe6;
+      }
+
+      .button-container {
+        text-align: right;
+        margin-top: 20px;
+      }
+
+      .save-button {
+        padding: 10px 20px;
+        background-color: #f8f9fa;
+        color: white;
+        border:none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .save-button:hover {
+        background-color: #45a049;
+      }
+
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 380px; /* Position icon inside input box */
+        transform: translateY(-50%);
+        font-size: 14px;
+        color: #aaa; /* Icon color */
+        pointer-events: none; /* Prevent clicking on the icon */
+      }
+
+      .dropdown-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 300px;
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #99ccff;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        background-color: #fff;
+        border-radius: 4px;
+        
+      }
+
+      .dropdown-list li {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .dropdown-list li:hover,
+      .highlighted {
+        background-color: #cce5ff;
+      }
+
+      .add-row-button {
+        margin-top: 10px;
+        margin-right: 10px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .add-row-button:hover {
+        background-color: #0056b3;
+      }
+      h1 {
+        background-color: #0066cc;
+        color: white;
+        padding: 10px 10px;
+        font-weight: bold;
+        font-size: 17px;
+      }
+
+      .fleet-master-nav {
+        position: relative;
+        top: 0;
+        z-index: 1020;
+        background-color: transparent !important;
+        border: 2px solid #0d6efd;
+        border-radius: 5px;
+        padding-top: 0.1rem;
+        padding-bottom: 0.1rem;
+        min-height: 40px;
+        width: 100%; /* Ensure full width */
+      }
+      
+      
+      .fleet-master-nav .navbar-brand,
+      .fleet-master-nav .nav-link {
+        color: #0d6efd !important;
+      }
+      
+      .fleet-master-nav .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(13, 110, 253, 0.75)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+      }
+      
+      .fleet-master-nav .navbar-toggler {
+        border-color: #0d6efd;
+      }
+      
+      #fleetMasterContent .container {
+        margin-top: 20px;
+
+      }
+      .fleet-master-nav .nav-link {
+        padding: 0.25rem 0.5rem;
+      }
+      .fleet-master-nav .nav-link i {
+        font-size: 20px;
+      }
+      
+      .fleet-master-nav .nav-link span {
+        font-size: 12px;
+      }
+      
+      .navbar-nav {
+        width: 100%;
+      }
+      
+      .nav-item {
+        display: flex;
+        align-items: center;
+      }
+      
+      .nav-link {
+        white-space: nowrap;
+      }
+      .fleet-master-nav .d-flex.flex-column {
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      button {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        margin-bottom: 10px;
+      }
+
+
+    
+
+      .button-submit {
+        margin-top: 20px;
+        padding-left: 35px;
+        font-weight: bold;
+        margin: 0 auto;
+        width: 200px;
+        font-size: 15px;
+        color: #fff;
+        background-color: #99ccff;
+        border: none;
+        border-radius: 5px;
+        height: 55px;
+        text-align: center;
+      }
+      .button-submit:hover {
+        background-color: #0056b3;
+      }
+
+    .sec-nav{
+      display:flex;
+      width: 90vw;
+      justify-content: space-between;
+      
+    }
+
+    .add-icon, .del-icon {
+      width: 25px;
+      height: 30px;
+    }
+    .nav-btn {
+      border: 1px solid #ccc;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      margin-right: 10px;
+      margin-top:10px;
+      transition: background-color 0.3s ease;
+  }
+
+  .nav-btn:hover {
+      background-color: #e2e6ea;
+  }
+
+  .snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    position: fixed;
+    z-index: 1;
+    bottom: 30px;
+    left: 50%;
+    font-size: 17px;
+    white-space: nowrap;
+    padding: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: visibility 0s, opacity 0.5s linear;
+}
+.snackbar.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+.table-container {
+  max-height: 550px; /* Set desired height for the scrollable area */
+  overflow-y: auto; /* Enable vertical scrolling */
+  border: 1px solid #ddd; /* Optional: Add a border around the scrollable area */
+}
+
+/* Optional: Style table to fit container */
+#related-data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#related-data-table th,
+#related-data-table td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+#related-data-table th {
+  background-color: #f2f2f2;
+  position: sticky; /* Keeps header visible when scrolling */
+  top: 0;
+  z-index: 10;
+}
+
+
+.meaning-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meaning-input-group {
+  display: flex;
+  align-items: center;
+}
+
+.top-save-button {
+  padding: 5px 10px;
+  background-color: #f8f9fa;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+}
+
+.top-save-button:hover {
+  background-color: #e2e6ea;
+}
+
+      
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1 style="padding-bottom:12px;margin-bottom:5px; font-size: 20px; font-weight: bold">Look Up Master</h1>
+      <nav class="navbar navbar-expand-lg navbar-dark fleet-master-nav">
+        <div class="container-fluid">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#fleetMasterNavbar" aria-controls="fleetMasterNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="fleetMasterNavbar">
+            <ul class="navbar-nav w-100">
+              <div class="d-flex justify-content-between w-100">
+                <div class="d-flex">
+                  
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" id="addRow">
+                      <button class="btn nav-btn" id="addinsuranceRow">
+                        <box-icon name="list-plus" color="green" class="add-icon"></box-icon>
+                        <span style="font-size: 15px; color: black; margin-left: 5px;">Add Row</span>
+                    </button>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" id="removeRow">
+                      <button class="btn nav-btn" id="removeinsuranceRow">
+                        <box-icon name="list-minus" color="red" class="del-icon"></box-icon>
+                        <span style="font-size: 15px; color: black; margin-left: 5px;">Del Row</span>
+                    </button>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#" >
+                      <button class="btn nav-btn" id="refreshpage">
+                        <box-icon name="refresh" color="black" class="del-icon"></box-icon>
+                        <span style="font-size: 15px; color: black; margin-left: 5px;">Refresh</span>
+                    </button>
+                    </a>
+                  </li>
+                </div>
+                <div>
+
+                </div>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </nav>
+   
+    <div class="search-section">
+      <label for="search">Search</label>
+      <input type="text" id="search" class="input-box" autocomplete="off" />
+      <i class="search-icon fas fa-search"></i>
+      <ul class="dropdown-list" id="dropdown-list" style="display: none;"></ul>
+  </div>
+
+      <div class="name-section">
+        <label for="list-name">List Name</label>
+        <input type="text" id="list-name" class="input-box" autocomplete="off" />
+      </div>
+
+      <div class="meaning-section">
+        <div class="meaning-input-group">
+        <label for="meaning">Meaning</label>
+        <input type="text" id="meaning" class="input-box" autocomplete="off" />
+      </div>
+
+
+    
+
+      <button class="top-save-button" id="topSaveButton">
+        <i class="fa-regular fa-floppy-disk" style="font-size: 20px;"></i>
+        <span style="font-size: 15px; margin-left: 5px;">Save</span>
+      </button>
+    </div>
+
+  
+
+      <div class="table-container">
+        
+        <table id="related-data-table">
+          <thead>
+            <tr>
+              <th style="text-align: center;">List Code</th>
+              <th style="text-align: center;">List Value</th>
+              <th style="text-align: center;">Meaning</th>
+              <th style="text-align: center;">Short Code</th>
+              <th style="text-align: center;">Start Date</th>
+              <th style="text-align: center;">End Date</th>
+              <th style="text-align: center;">Active</th>
+            </tr>
+          </thead>
+          <tbody id="related-data-table-body">
+            <!-- Rows will be dynamically added here -->
+          </tbody>
+         
+        </table>
+        <div id="snackbar">No data available</div>
+      </div>
+
+      <div class="button-container">
+        <button class="save-button" id="saveButton">
+          <i class="fa-regular fa-floppy-disk" style="font-size: 20px; color: black;"></i>
+          <span style="font-size: 15px; color: black; margin-left: 5px;">Save</span></button>
+
+      </div>
+    </div>
+    <script>
+
+      document.getElementById('refreshpage').addEventListener('click', function(event) {
+        // Prevent the default anchor behavior if any
+        event.preventDefault();
+        
+        // Reload the page to refresh and return to the initial state
+        window.location.reload();
+    });
+      // Function to check fields and show/hide save button
+function checkFields() {
+  const listName = document.getElementById('list-name').value.trim();
+  const meaning = document.getElementById('meaning').value.trim();
+  const saveButton = document.getElementById('topSaveButton');
+  
+  if (listName && meaning) {
+    saveButton.style.display = 'flex';
+  } else {
+    saveButton.style.display = 'none';
+  }
+}
+
+// Add event listeners to List Name and Meaning inputs
+document.getElementById('list-name').addEventListener('input', checkFields);
+document.getElementById('meaning').addEventListener('input', checkFields);
+
+// Function to create a lookup master entry
+async function createLookupMaster(lookupName, meaning) {
+  const url = 'http://127.0.0.1:8000/api/lookup-master/'; // Replace with your actual API endpoint
+  const data = {
+    LOOKUP_NAME: lookupName,
+    MEANING: meaning,
+    // You can add other optional fields here if needed
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Add any other required headers (e.g., authentication token)
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    
+    if (response.ok) {
+      alert(result.message); // Show success message
+      // Clear the input fields after successful creation
+      document.getElementById('list-name').value = '';
+      document.getElementById('meaning').value = '';
+      checkFields(); // Hide the save button
+    } else {
+      alert('Error: ' + result.message); // Show error message
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred while saving the data.');
+  }
+}
+
+// Add event listener for the save button
+document.getElementById('topSaveButton').addEventListener('click', function() {
+  const listName = document.getElementById('list-name').value.trim();
+  const meaning = document.getElementById('meaning').value.trim();
+  
+  if (listName && meaning) {
+    createLookupMaster(listName, meaning);
+  } else {
+    alert('Please fill in both List Name and Meaning fields.');
+  }
+});
+      
+    
+
+  // Add Row Functionality
+    document.getElementById('addRow').addEventListener('click', function () {
+        const tableBody = document.getElementById('related-data-table-body');
+        const newRow = document.createElement('tr');
+      
+    // Create new table cells with input fields
+    newRow.innerHTML = `
+        <td><input type="text" class="table-input list-code" style="background-color: #ffffe0;" /></td>
+        <td><input type="text" class="table-input list-value" style="background-color: #ffffe0;" /></td>
+        <td><input type="text" class="table-input meaning" style="background-color: #ffffe0;" /></td>
+        <td><input type="text" class="table-input" /></td>
+        <td><input type="text" class="table-input start-date" style="background-color: #ffffe0;" /></td>
+        <td><input type="text" class="table-input" /></td>
+        <td><input type="text" class="table-input" /></td>
+    `;
+
+    // Mark row as dynamically added
+    newRow.setAttribute('data-dynamic', 'true');
+
+    tableBody.appendChild(newRow);
+    console.log('New row added with data-dynamic attribute');
+});
+
+// Delete Row Functionality
+document.getElementById('removeRow').addEventListener('click', function () {
+  const tableBody = document.getElementById('related-data-table-body');
+  const rows = tableBody.querySelectorAll('tr[data-dynamic="true"]');
+  
+  if (rows.length > 0) {
+    // Remove only the last dynamically added row
+    tableBody.removeChild(rows[rows.length - 1]);
+  }
+});
+
+// Main function for creating lookup details
+function createLookupDetail(data) {
+  return fetch('http://127.0.0.1:8000/api/xxaly-gtd-lookup-detail/', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': 'Bearer YOUR_TOKEN_HERE' // Uncomment if needed
+      },
+      body: JSON.stringify(data),
+      credentials: 'include' // Include credentials if your server requires them
+  })
+  .then(response => {
+      if (!response.ok) {
+          return response.json().then(err => { throw err; });
+      }
+      return response.json();
+  })
+  .then(data => {
+      console.log('Success:', data);
+      return data;
+  })
+  .catch((error) => {
+      console.error('Error:', error);
+      throw error;
+  });
+}
+
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search');
+        const dropdownList = document.getElementById('dropdown-list');
+        const listNameInput = document.getElementById('list-name');
+        const meaningInput = document.getElementById('meaning');
+        const relatedDataTableBody = document.getElementById('related-data-table-body'); // Corrected ID reference
+        const snackbar = document.getElementById('snackbar');
+    
+        // Function to fetch and display dropdown list
+        function updateDropdownList(query) {
+            fetch(`/api/meanings/?search=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+
+                  // Sort the data alphabetically
+                    data.sort((a, b) => a.localeCompare(b));
+
+                    dropdownList.innerHTML = '';
+
+                    // Filter and display the items that match the user's input
+                        const filteredData = data.filter(item => 
+                        item.toLowerCase().includes(query.toLowerCase())
+                    );
+                    filteredData.forEach(item => {
+                      const listItem = document.createElement('li');
+                      listItem.textContent = item;
+                      listItem.classList.add('dropdown-item');
+                      listItem.addEventListener('click', function() {
+                          fetchLookupDetails(item);
+                          searchInput.value = item;
+                          dropdownList.style.display = 'none';
+                      });
+                      dropdownList.appendChild(listItem);
+                  });
+      
+                  dropdownList.style.display = filteredData.length > 0 ? 'block' : 'none';
+              })
+              .catch(error => console.error('Error fetching data:', error));
+      }
+
+              
+        // Function to fetch and display LOOKUP_NAME and MEANING
+        function fetchLookupDetails(meaning) {
+            fetch(`/api/lookup-details/?meaning=${encodeURIComponent(meaning)}`)
+                .then(response => response.json())
+                .then(data => {
+                    meaningInput.value = data.meaning || ''; // Display MEANING
+                    listNameInput.value = data.lookup_name || ''; // Display LOOKUP_NAME
+                    
+                    // Automatically trigger fetching related data using LOOKUP_NAME
+                    if (data.lookup_name) {
+                        fetchRelatedDataByLookupName(data.lookup_name); // Trigger related data fetch
+                    }
+                })
+                .catch(error => console.error('Error fetching lookup details:', error));
+        }
+    
+        function fetchRelatedDataByLookupName(lookupName) {
+          fetch(`/api/related-data/?lookup_name=${encodeURIComponent(lookupName)}`)
+              .then(response => response.json())
+              .then(data => {
+                  relatedDataTableBody.innerHTML = ''; // Clear existing rows
+                  if (data.length > 0) {
+                      data.forEach(row => {
+                          const tableRow = document.createElement('tr');
+                          
+                          // Create cells with specific background colors
+                          const lookupCodeCell = document.createElement('td');
+                          lookupCodeCell.textContent = row.LOOKUP_CODE || '';
+                          lookupCodeCell.style.backgroundColor = '#ffffe0';
+                          
+                          const lookupValueCell = document.createElement('td');
+                          lookupValueCell.textContent = row.LOOKUP_VALUE || '';
+                          lookupValueCell.style.backgroundColor = '#ffffe0';
+                          
+                          const meaningCell = document.createElement('td');
+                          meaningCell.textContent = row.MEANING || '';
+                          meaningCell.style.backgroundColor = '#ffffe0';
+                          
+                          const startDateCell = document.createElement('td');
+                          startDateCell.textContent = row.LOOKUP_SHORT_CODE || '';
+                          
+                          const lookupShortCodeCell = document.createElement('td');
+                          lookupShortCodeCell.textContent = row.START_DATE || '';
+                          lookupShortCodeCell.style.backgroundColor = '#ffffe0';
+
+                          const endDateCell = document.createElement('td');
+                          endDateCell.textContent = row.END_DATE || '';
+                          
+                          const activeCell = document.createElement('td');
+                          activeCell.textContent = row.ACTIVE || '';
+                          
+                          // Append cells to the row
+                          tableRow.appendChild(lookupCodeCell);
+                          tableRow.appendChild(lookupValueCell);
+                          tableRow.appendChild(meaningCell);
+                          tableRow.appendChild(startDateCell);
+                          tableRow.appendChild(lookupShortCodeCell);
+                          tableRow.appendChild(endDateCell);
+                          tableRow.appendChild(activeCell);
+                          
+                          relatedDataTableBody.appendChild(tableRow);
+                      });
+                      snackbar.className = 'snackbar'; // Hide snackbar
+                  } else {
+                      snackbar.className = 'snackbar show'; // Show snackbar
+                  }
+              })
+              .catch(error => console.error('Error fetching related data:', error));
+      }
+      
+     
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.trim();
+            if (query) {
+                updateDropdownList(query);
+            } else {
+                dropdownList.style.display = 'none';
+            }
+        });
+    
+        document.addEventListener('click', function(event) {
+            if (!searchInput.contains(event.target) && !dropdownList.contains(event.target)) {
+                dropdownList.style.display = 'none';
+            }
+        });
+    });
+
+
+    document.getElementById('saveButton').addEventListener('click', function() {
+      const tableBody = document.getElementById('related-data-table-body');
+      const allRows = tableBody.querySelectorAll('tr');
+      const listNameElement = document.getElementById('list-name');
+      const lookupName = listNameElement ? listNameElement.value : null;
+  
+      // Validation for the List Name field
+      if (!lookupName) {
+          alert('The List Name field is missing or empty.');
+          return;
+      }
+  
+      const newLookupDetails = [];
+  
+      allRows.forEach((row, index) => {
+          if (!row.hasAttribute('data-existing-row')) {
+              const inputs = row.querySelectorAll('input');
+  
+              // Debug: Log the row and input values
+              console.log(`Row ${index + 1}, Number of inputs:`, inputs.length);
+              inputs.forEach((input, i) => {
+                  console.log(`Input ${i + 1} value:`, input.value);
+              });
+  
+              // Ensure the correct number of inputs are present
+              if (inputs.length >= 7) {
+                  if (inputs[0]?.value || inputs[1]?.value || inputs[2]?.value) {
+                      newLookupDetails.push({
+                          LOOKUP_CODE: inputs[0]?.value || '',
+                          LOOKUP_VALUE: inputs[1]?.value || '',
+                          MEANING: inputs[2]?.value || '',
+                          LOOKUP_SHORT_CODE: inputs[3]?.value || null,
+                          START_DATE: inputs[4]?.value || '',
+                          END_DATE: inputs[5]?.value || null,
+                          ACTIVE: inputs[6]?.value || '',
+                          LOOKUP_NAME: lookupName
+                      });
+                  }
+              } else {
+                  console.warn('Unexpected number of input fields in a row:', row);
+              }
+          }
+      });
+  
+      if (newLookupDetails.length > 0) {
+          createLookupDetail(newLookupDetails)
+              .then(response => {
+                  console.log('New lookup details saved successfully:', response);
+                  alert(response.message || 'New lookup details saved successfully');
+                  // Mark newly saved rows as existing
+                  allRows.forEach(row => {
+                      if (!row.hasAttribute('data-existing-row')) {
+                          row.setAttribute('data-existing-row', 'true');
+                      }
+                  });
+                  // Optionally, update the table with saved data from response.items
+              })
+              .catch(error => {
+                  console.error('Error saving new lookup details:', error);
+                  alert(error.detail || 'An error occurred while saving the lookup details.');
+              });
+      } else {
+          console.log('No new rows to save.');
+          alert('No new rows to save.');
+      }
+  });
+  
+ 
+ 
+    </script>
+    
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+  </body>
+  </html>

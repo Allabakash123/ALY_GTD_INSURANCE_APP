@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View, TemplateView
 from django.shortcuts import resolve_url, reverse
+from ALY_GTD.models import CustomUser
 from core.utils import form_elements, get_model_obj, get_loginuser_details
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -21,6 +22,7 @@ from accounts.helpers import get_dynamic_menu, get_all_menu
 from rest_framework import views as DRF_views, response
 from .serializers import *
 import json
+from rest_framework.authtoken.models import Token
 
 # Create your views here.
 def imitate(request):
@@ -33,65 +35,39 @@ def imitate(request):
         JsonResponse('Error', safe=False)
 
     return render(request, resolve_url( "core:home_iframe") )
+
 def login(request):
-    
-    # # stop
     if request.user.is_authenticated:
-        return redirect( resolve_url( "core:home_iframe") )
-        
+        return redirect(resolve_url("core:home_iframe"))
+       
     if request.method == 'POST':
         username = request.POST['username'].upper().strip()
         password = request.POST['password']
-        
+       
         print(settings.LDAP_URL)
         settings.AUTH_LDAP_BIND_DN = 'alyousuf\\' + str(username)
         settings.AUTH_LDAP_BIND_PASSWORD = password
         server = Server(settings.LDAP_URL)
-        
+       
         # Django Authentication Backend
         user = auth.authenticate(username=username, password=password)
-        
+       
         request.session['username'] = username
-        
-        # if user is None or settings.ENV=='PROD':
-        #     c = Connection(server, user='alyousuf\\' + str(username), password=password)
-
-        #     try:
-        #         is_ldap_user = c.bind()
-        #         pass
-        #     except Exception as e:
-        #         is_ldap_user = False
-        #     print('is_ldap_user--->',is_ldap_user)
-        #     if is_ldap_user:
-        #         user = auth.authenticate(username=username, password=password)
-        #         fetchUserDetailsFromLDAP(username,password)
-        #         u = User.objects.get(username=username)
-        #         u.set_password(password)
-        #         u.save()
-
-        #     user = auth.authenticate(username=username, password=password)
-
         if user is not None:
-
-            # c = Connection(server, user='alyousuf\\' + str(username), password=password)
-            # try:
-            #     is_ldap_user = c.bind()
-            #     pass
-            # except Exception as e:
-            #     is_ldap_user = False
-            # print('is_ldap_user-->',is_ldap_user)
-            # if is_ldap_user:
-            #     user = auth.authenticate(username=username, password=password)
-            #     fetchUserDetailsFromLDAP(username,password)
-            #     u = User.objects.get(username=username)
-            #     u.set_password(password)
-            #     u.save()
-            
             auth.login(request, user)
+
+            # Restore preserved session data if available
+            preserved_data = request.session.get('preserved_data', {})
+            if preserved_data:
+                request.session['check_in_time'] = preserved_data.get('check_in_time')
+                request.session['check_out_time'] = preserved_data.get('check_out_time')
+                # Clear preserved data from session
+                del request.session['preserved_data']
+
             request.session['user'] = username
             user_tenant = UserOrganisationInventory.objects.filter(user=user.id).first()
             request.session["tenant_disabled"] = "0"
-            if user_tenant==None:
+            if user_tenant == None:
                 tenant = None
             else:
                 tenant = None if not user_tenant.inventory else user_tenant.inventory.pk
@@ -99,20 +75,40 @@ def login(request):
             request.session['emp_id'] = UserProfile.objects.get(user_id=user.id).employee_id
             request.session['username'] = UserProfile.objects.get(user_id=user.id).user_name
             request.session['role'] = '' if not user_tenant else user_tenant.role.pk
-            return redirect(resolve_url( "core:user_announcement"))
+
+            # Check CustomUser roles
+            custom_user = CustomUser.objects.get(username=user.username)
+            roles = custom_user.roles.split(',') if custom_user.roles else []
+            roles2 = custom_user.role2.split(',') if custom_user.role2 else []
+            all_roles = set(roles + roles2)
+
+            is_requestor = "REQUESTOR" in all_roles
+            is_approver = "APPROVER" in all_roles
+            
+            request.session['is_requestor'] = is_requestor
+            request.session['is_approver'] = is_approver
+            request.session['is_both'] = is_requestor and is_approver
+
+            token, created = Token.objects.get_or_create(user=user)
+            print(f"Authentication Token for {username}: {token.key}")
+
+            # Store token in local storage instead of session
+            response = redirect(resolve_url("core:user_announcement"))
+            response.set_cookie('auth_token', token.key, httponly=False)  # Set httponly to False to allow JavaScript access
+
+            return response
         else:
             messages.error(request, 'Incorrect Username or Password')
-            return redirect(resolve_url( "core:login"))
+            return redirect(resolve_url("core:login"))
     else:
-        announcements = AnnouncementsSerializer(Announcements.objects.all(),many=True).data
-        events = EventsSerializer(Events.objects.all(),many=True).data
+        announcements = AnnouncementsSerializer(Announcements.objects.all(), many=True).data
+        events = EventsSerializer(Events.objects.all(), many=True).data
         data = {
-            'login_form_url' : resolve_url( "core:login"),
-            'announcements':announcements,
-            'events' :events
+            'login_form_url': resolve_url("core:login"),
+            'announcements': announcements,
+            'events': events
         }
         return render(request, 'core/login.html', context=data)
-    
 @method_decorator(login_required, name='dispatch')
 class IframeView(View):
     
@@ -149,11 +145,26 @@ class IframeView(View):
         data = {'menu':all_menus,'user_menus':user_accessible_menus,'user_inv_array':inv_array,'APP_VERSION':settings.APP_VERSION, 'roles_json': json.dumps({"roles": [item.role.identifier for item in user_inventories if item.role.identifier is not None]})}
         return render(request, "core/iframe.html", context=data)
 
+# def logout(request):
+#     auth.logout(request)
+#     messages.success(request, 'You are now logged out')
+#     return redirect(resolve_url( "core:login"))
 def logout(request):
+    # Save session data
+    preserved_data = {
+        'check_in_time': request.session.get('check_in_time'),
+        'check_out_time': request.session.get('check_out_time'),
+    }
+
+    # Store preserved data in user's session
+    request.session['preserved_data'] = preserved_data
+
+    # Log out the user
     auth.logout(request)
     messages.success(request, 'You are now logged out')
-    return redirect(resolve_url( "core:login"))
- 
+
+    return redirect(resolve_url("core:login"))
+
 def user_announcement(request):
     all_menus = get_all_menu(request)
     user_accessible_menus = get_dynamic_menu(request.user.id)
